@@ -14,8 +14,10 @@
 WLAN -> 连接的 WLAN -> 代理 -> 手动
 开启本软件后如遇到设备网络异常请取消代理设置并关闭本软件
 
-感谢该项目提供了 NodeJS 版的同类软件，本项目业务逻辑大量参考了该项目（包括 APP 的图标来源）：
+感谢该项目提供了 NodeJS 版的同类软件，本项目业务逻辑大量参考了该项目（包括 APP 的图标来源）：    
+
 https://github.com/nondanee/UnblockNeteaseMusic
 
 感谢该项目提供了高性能的 HTTP Proxy 实现：
+
 https://github.com/alanzplus/HTTP-Proxy
