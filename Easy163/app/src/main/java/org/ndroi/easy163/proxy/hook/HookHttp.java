@@ -19,6 +19,11 @@ public class HookHttp
     {
         return instance;
     }
+    public interface HttpsBlockRule
+    {
+        boolean rule(String host);
+    }
+    HttpsBlockRule httpsBlockRule = null;
 
     private List<Hook> hooks = new ArrayList<>();
     private List<String> httpsBlockList = new ArrayList<>();
@@ -29,6 +34,11 @@ public class HookHttp
         httpsBlockList.add(host);
     }
 
+    public void setHttpsBlockRule(HttpsBlockRule rule)
+    {
+        httpsBlockRule = rule;
+    }
+
     public void addHttpBlock(String host)
     {
         httpBlockList.add(host);
@@ -36,7 +46,11 @@ public class HookHttp
 
     public boolean isHttpsBlocked(String host)
     {
-        return httpsBlockList.contains(host);
+        if(httpsBlockList.contains(host))
+        {
+            return true;
+        }
+        return httpsBlockRule != null && httpsBlockRule.rule(host);
     }
 
     public boolean isHttpBlocked(String host)

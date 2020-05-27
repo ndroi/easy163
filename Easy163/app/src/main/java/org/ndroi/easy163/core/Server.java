@@ -5,6 +5,7 @@ import org.ndroi.easy163.hooks.ForceCloseHook;
 import org.ndroi.easy163.hooks.PlaylistHook;
 import org.ndroi.easy163.hooks.SongPlayHook;
 import org.ndroi.easy163.proxy.NIOHttpProxy;
+import org.ndroi.easy163.proxy.hook.HookHttp;
 
 public class Server
 {
@@ -26,14 +27,34 @@ public class Server
 
     private void setHttpsBlock()
     {
-        proxy.addHttpsBlock("music.163.com");
-        proxy.addHttpsBlock("interface.music.163.com");
-        proxy.addHttpsBlock("interface3.music.163.com");
-        /* block log upload */
-        proxy.addHttpsBlock("apm.music.163.com");
-        proxy.addHttpsBlock("apm3.music.163.com");
-        proxy.addHttpsBlock("clientlog3.music.163.com");
-        proxy.addHttpsBlock("clientlog.music.163.com");
+//        proxy.addHttpsBlock("music.163.com");
+//        proxy.addHttpsBlock("interface.music.163.com");
+//        proxy.addHttpsBlock("interface3.music.163.com");
+//        proxy.addHttpsBlock("api.iplay.163.com");
+//        proxy.addHttpsBlock("m801.music.126.net");
+//        proxy.addHttpsBlock("m701.music.126.net");
+//        proxy.addHttpsBlock("m8.music.126.net");
+//        /* block log upload */
+//        proxy.addHttpsBlock("apm.music.163.com");
+//        proxy.addHttpsBlock("apm3.music.163.com");
+//        proxy.addHttpsBlock("clientlog3.music.163.com");
+//        proxy.addHttpsBlock("clientlog.music.163.com");
+        proxy.setHttpsBlockRule(new HookHttp.HttpsBlockRule()
+        {
+            @Override
+            public boolean rule(String host)
+            {
+                if(host.endsWith("music.163.com"))
+                {
+                    return true;
+                }
+                if(host.endsWith("music.126.net") && !host.startsWith("p"))
+                {
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void setHttpBlock()

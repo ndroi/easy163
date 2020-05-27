@@ -109,20 +109,23 @@ public class ClientSocketChannelHandler implements EventHandler
                                 client.shutdownIS();
                             } else
                             {
-                                /* block https begin */
-                                if (context.isHttps() && HookHttp.getInstance().isHttpsBlocked(host.getName()))
+                                if (context.isHttps())
                                 {
-                                    Log.d("block https", host.getName());
-                                    host.closeIO();
-                                    client.closeIO();
-                                    /*try
+                                    try
                                     {
                                         String remoteAddress = host.getChannel().getRemoteAddress().toString();
                                         Log.d("https remote address", remoteAddress);
                                     }catch (IOException e)
                                     {
                                         e.printStackTrace();
-                                    }*/
+                                    }
+                                }
+                                /* block https begin */
+                                if (context.isHttps() && HookHttp.getInstance().isHttpsBlocked(host.getName()))
+                                {
+                                    Log.d("block https", host.getName());
+                                    host.closeIO();
+                                    client.closeIO();
                                 }
                                 /* block https end */
                                 else
