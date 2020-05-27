@@ -44,7 +44,7 @@ public class Server
             @Override
             public boolean rule(String host)
             {
-                if(host.endsWith("music.163.com"))
+                if(host.endsWith("music.163.com") && !host.startsWith("p"))
                 {
                     return true;
                 }
