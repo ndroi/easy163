@@ -22,7 +22,7 @@ public class HookManager
 {
     private ProxyContext context;
     private Hook hook;
-    private List<String> removedRequestHeader = Arrays.asList("Proxy-Connection", "Accept-Encoding");
+    private List<String> removedRequestHeader = Arrays.asList("Proxy-Connection", "Accept-Encoding", "x-napm-retry");
 
     public HookManager(ProxyContext context, Hook hook)
     {
