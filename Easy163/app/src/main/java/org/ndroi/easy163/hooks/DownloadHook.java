@@ -1,5 +1,7 @@
 package org.ndroi.easy163.hooks;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.providers.utils.Stream2Bytes;
@@ -8,6 +10,7 @@ import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Song;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -19,22 +22,21 @@ import java.security.NoSuchAlgorithmException;
 public class DownloadHook extends Hook
 {
     @Override
-    public boolean rule(String uri)
+    public boolean rule(String method, String uri)
     {
-        String host = uri2Host(uri);
-        if(!host.endsWith("music.163.com"))
+        if(!method.equals("POST") || !uri2Host(uri).endsWith("music.163.com"))
         {
             return false;
         }
         String path = uri2Path(uri);
-        if(!path.endsWith("eapi/song/enhance/download/url"))
+        if(!path.endsWith("/song/enhance/download/url"))
         {
             return false;
         }
         return true;
     }
 
-    private String downloadForMd5(String url)
+    private String preDownloadForMd5(String url)
     {
         String md5 = "";
         try
@@ -46,8 +48,17 @@ public class DownloadHook extends Hook
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
                 MessageDigest messageDigest = MessageDigest.getInstance("md5");
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
-                messageDigest.update(content);
+                InputStream inputStream = connection.getInputStream();
+                byte[] bytes = new byte[4096];
+                while (true)
+                {
+                    int readLen = inputStream.read(bytes);
+                    if(readLen == -1)
+                    {
+                        break;
+                    }
+                    messageDigest.update(bytes, 0, readLen);
+                }
                 for (byte b : messageDigest.digest())
                 {
                     String temp = Integer.toHexString(b & 0xff);
@@ -75,10 +86,11 @@ public class DownloadHook extends Hook
         {
             String id = songObject.getString("id");
             Song providerSong = (Song) Cache.providerSongs.get(id);
-            //providerSong.md5 = downloadForMd5(providerSong.url);
-            //providerSong.md5 = "8d1fdd1387329f66a3c306c12494aaf8";
-            //providerSong.br = 320000;
-            //providerSong.size = 13109333;
+            if(providerSong.md5.isEmpty())
+            {
+                providerSong.md5 = preDownloadForMd5(providerSong.url);
+                Log.d("DownloadHook", "Pre-download for md5: " + providerSong.md5);
+            }
             songObject.put("fee", 0);
             songObject.put("code", 200);
             songObject.put("url", providerSong.url);
@@ -99,6 +111,7 @@ public class DownloadHook extends Hook
         bytes = Crypto.aesDecrypt(bytes);
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleDownload(jsonObject);
+        Log.d("DownloadHook", jsonObject.toString());
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
         return bytes;

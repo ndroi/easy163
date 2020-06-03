@@ -6,6 +6,7 @@ import org.ndroi.easy163.proxy.buffer.ChannelBuffer;
 import org.ndroi.easy163.proxy.context.ConnectionContext;
 import org.ndroi.easy163.proxy.context.ProxyContext;
 
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.*;
 
@@ -19,12 +20,6 @@ public class HookHttp
     {
         return instance;
     }
-    public interface HttpsBlockRule
-    {
-        boolean rule(String host);
-    }
-    HttpsBlockRule httpsBlockRule = null;
-
     private List<Hook> hooks = new ArrayList<>();
     private List<String> httpsBlockList = new ArrayList<>();
     private List<String> httpBlockList = new ArrayList<>();
@@ -34,11 +29,6 @@ public class HookHttp
         httpsBlockList.add(host);
     }
 
-    public void setHttpsBlockRule(HttpsBlockRule rule)
-    {
-        httpsBlockRule = rule;
-    }
-
     public void addHttpBlock(String host)
     {
         httpBlockList.add(host);
@@ -46,11 +36,7 @@ public class HookHttp
 
     public boolean isHttpsBlocked(String host)
     {
-        if(httpsBlockList.contains(host))
-        {
-            return true;
-        }
-        return httpsBlockRule != null && httpsBlockRule.rule(host);
+        return httpsBlockList.contains(host);
     }
 
     public boolean isHttpBlocked(String host)
@@ -63,15 +49,15 @@ public class HookHttp
         hooks.add(hook);
     }
 
-    /* only apply the fist rule-satisfying hook */
-    public boolean checkAndHookTarget(ProxyContext context, String uri)
+    /* only apply the fist match hook */
+    public boolean checkAndHookTarget(ProxyContext context, String method, String uri)
     {
         Log.d("hook check", uri);
         for (Hook hook : hooks)
         {
-            if (hook.rule(uri))
+            if (hook.rule(method, uri))
             {
-                Log.d("hook register", uri);
+                Log.d("hook match", uri);
                 new HookManager(context, hook).asyncHook();
                 return true;
             }

@@ -1,83 +1,60 @@
 package org.ndroi.easy163.hooks;
 
 import android.util.Log;
-
 import com.alibaba.fastjson.JSONObject;
-
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.hooks.utils.JsonUtil;
 import org.ndroi.easy163.proxy.hook.Hook;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Keyword;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by andro on 2020/5/3.
  */
 public class PlaylistHook extends Hook
 {
+    private List<String> hosts = Arrays.asList(
+            "music.163.com",
+            "interface.music.163.com",
+            "interface3.music.163.com"
+    );
+    private List<String> paths = Arrays.asList(
+            "/playlist/detail",
+            "/eapi/playlist/v4/detail",
+            "/eapi/play-record/playlist/list",
+            "/eapi/album/v3/detail",
+            "/discovery/recommend/songs",
+            "/eapi/album/privilege",
+            "/eapi/batch",
+            "/artist/privilege",
+            "/eapi/artist/top/song",
+            "/api/v3/song/detail",
+            "/eapi/song/enhance/privilege"
+    );
+
     @Override
-    public boolean rule(String uri)
+    public boolean rule(String method, String uri)
     {
-        String host = uri2Host(uri);
-        if(!host.endsWith("music.163.com"))
+        if(!method.equals("POST") || !hosts.contains(uri2Host(uri)))
         {
             return false;
         }
         String path = uri2Path(uri);
         Log.d("check path", path);
-        if(path.contains("/playlist/detail"))
+        for(String p : paths)
         {
-            return true;
-        }
-        if(path.contains("/eapi/album/v3/detail"))
-        {
-            return true;
-        }
-        if(path.contains("/discovery/recommend/songs"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/album/privilege"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/batch"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/play-record/playlist/list"))
-        {
-            return true;
-        }
-        if(path.contains("/artist/privilege"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/artist/top/song"))
-        {
-            return true;
-        }
-        if(path.contains("/api/v3/song/detail"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/playlist/v4/detail"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/playlist/"))
-        {
-            return true;
-        }
-        if(path.contains("/eapi/song/enhance/privilege"))
-        {
-            return true;
+            if(path.contains(p))
+            {
+                return true;
+            }
         }
         return false;
     }
 
     @Override
-    public byte[] hook(byte[] bytes) throws Exception
+    public byte[] hook(byte[] bytes)
     {
         bytes = Crypto.aesDecrypt(bytes);
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));

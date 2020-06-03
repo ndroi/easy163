@@ -56,11 +56,6 @@ public class NIOHttpProxy
         HookHttp.getInstance().addHttpsBlock(host);
     }
 
-    public void setHttpsBlockRule(HookHttp.HttpsBlockRule rule)
-    {
-        HookHttp.getInstance().setHttpsBlockRule(rule);
-    }
-
     public void addHttpBlock(String host)
     {
         HookHttp.getInstance().addHttpBlock(host);

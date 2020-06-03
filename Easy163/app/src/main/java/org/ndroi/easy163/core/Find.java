@@ -35,7 +35,6 @@ public class Find
                     JSONObject singer = (JSONObject)singerObj;
                     keyword.singers.add(singer.getString("name"));
                 }
-
             }
         } catch (IOException e)
         {

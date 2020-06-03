@@ -12,7 +12,7 @@ public class Stream2Bytes
     public static byte[] stream2Bytes(InputStream is)
     {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         try
         {
             while (true)

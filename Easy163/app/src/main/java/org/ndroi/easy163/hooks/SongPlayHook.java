@@ -16,12 +16,10 @@ import org.ndroi.easy163.utils.Song;
  */
 public class SongPlayHook extends Hook
 {
-
     @Override
-    public boolean rule(String uri)
+    public boolean rule(String method, String uri)
     {
-        String host = uri2Host(uri);
-        if(!host.endsWith("music.163.com"))
+        if(!method.equals("POST") || !uri2Host(uri).endsWith("music.163.com"))
         {
             return false;
         }

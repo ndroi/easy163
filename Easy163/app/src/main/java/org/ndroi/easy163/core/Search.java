@@ -65,7 +65,7 @@ public class Search
         }
         if(!songs.isEmpty())
         {
-            Log.d("search","from provider: " + songs.get(0).url);
+            Log.d("search","from provider: " + songs.get(0).url + "/" + songs.get(0).md5);
             return songs.get(0);
         }
         return null;

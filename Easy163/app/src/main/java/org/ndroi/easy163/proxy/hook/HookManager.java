@@ -5,7 +5,7 @@ import org.ndroi.easy163.proxy.buffer.ChannelBuffer;
 import org.ndroi.easy163.proxy.context.ProxyContext;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -22,8 +22,10 @@ public class HookManager
 {
     private ProxyContext context;
     private Hook hook;
-    private List<String> removedRequestHeader = Arrays.asList("Proxy-Connection", "Accept-Encoding");
-
+    private List<String> RequestHeaderToRemove = Arrays.asList(
+            "Proxy-Connection",
+            "Accept-Encoding",
+            "x-napm-retry");
     public HookManager(ProxyContext context, Hook hook)
     {
         this.context = context;
@@ -38,6 +40,7 @@ public class HookManager
             {
                 super.run();
                 Request request = receiveRequest();
+                Log.d("request", request.getMethod() + " " + request.getUri());
                 HttpURLConnection connection = getRemoteConnection(request);
                 writeBack(connection);
             }
@@ -52,7 +55,7 @@ public class HookManager
         while (!request.finished())
         {
             byteBuffer.flip();
-            byte[] bytes=new byte[byteBuffer.limit()];
+            byte[] bytes = new byte[byteBuffer.limit()];
             byteBuffer.get(bytes);
             request.putBytes(bytes);
             byteBuffer.clear();
@@ -84,7 +87,7 @@ public class HookManager
             connection.setRequestMethod(request.getMethod());
             for (String key : request.getHeaderFields().keySet())
             {
-                if(!removedRequestHeader.contains(key))
+                if(!RequestHeaderToRemove.contains(key))
                 {
                     connection.setRequestProperty(key, request.getHeaderFields().get(key));
                 }
@@ -113,6 +116,10 @@ public class HookManager
         headerFields.remove(null);
         headerFields.remove("Transfer-Encoding");
         headerFields.remove("Content-Encoding");
+        if(headerFields.containsKey("Content-Range"))
+        {
+            responseLine = responseLine.replace("200", "206");
+        }
         try
         {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -125,7 +132,7 @@ public class HookManager
             {
                 inputStream = connection.getErrorStream();
             }
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
             while (true)
             {
                 int len = inputStream.read(buffer);
@@ -138,7 +145,7 @@ public class HookManager
                 content = hook.hook(content);
             }catch (Exception e)
             {
-                Log.d("writeBack", "Hook failed");
+                Log.d("hook", "Hook failed");
             }
             byteArrayOutputStream.reset();
             headerFields.put("Content-Length", content.length + "");

@@ -23,9 +23,9 @@ public class Crypto
     {
         try
         {
-            decryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            decryptCipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
             decryptCipher.init(Cipher.DECRYPT_MODE, key);
-            encryptCipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            encryptCipher = Cipher.getInstance("AES/ECB/PKCS7Padding");
             encryptCipher.init(Cipher.ENCRYPT_MODE, key);
         } catch (NoSuchAlgorithmException e)
         {

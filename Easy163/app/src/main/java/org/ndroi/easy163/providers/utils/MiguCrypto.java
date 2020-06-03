@@ -60,7 +60,6 @@ public class MiguCrypto
         {
             e.printStackTrace();
         }
-
         byte[] skey = new byte[16*2];
         System.arraycopy(byteList.get(0), 0, skey,0, 16);
         System.arraycopy(byteList.get(1), 0, skey,16, 16);

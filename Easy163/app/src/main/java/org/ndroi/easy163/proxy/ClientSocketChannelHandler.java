@@ -233,11 +233,11 @@ public class ClientSocketChannelHandler implements EventHandler
                     }
                 }
             }
-            /* Hook register */
+            /* Hook */
             {
                 if (!line.isHttps)
                 {
-                    boolean needHook = HookHttp.getInstance().checkAndHookTarget(context, uri);
+                    boolean needHook = HookHttp.getInstance().checkAndHookTarget(context, line.method, uri);
                     if(needHook)
                     {
                         return true;

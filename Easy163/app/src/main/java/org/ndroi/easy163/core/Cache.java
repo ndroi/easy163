@@ -1,9 +1,6 @@
 package org.ndroi.easy163.core;
 
-import android.content.SyncContext;
-
 import org.ndroi.easy163.utils.Keyword;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -38,7 +35,7 @@ public class Cache
 
     public void add(String id, Object value)
     {
-        //synchronized (items)
+        synchronized (items)
         {
             cleanExpired();
             items.put(id, value);
@@ -47,7 +44,7 @@ public class Cache
 
     public Object get(String id)
     {
-        //synchronized (items)
+        synchronized (items)
         {
             if(items.containsKey(id))
             {

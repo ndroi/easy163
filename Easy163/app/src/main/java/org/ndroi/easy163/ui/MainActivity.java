@@ -82,9 +82,10 @@ public class MainActivity extends AppCompatActivity
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件后，设置系统代理为：\n" +
                     "主机：127.0.0.1 \n" +
-                    "端口：8080 \n" +
+                    "端口：8163 \n" +
                     "如 MIUI：\n" +
                     "WLAN -> 连接的 WLAN -> 代理 -> 手动 。\n" +
+                    "如无法使用请重启网易云。\n" +
                     "开启本软件后如遇到设备网络异常请取消代理设置并关闭本软件。");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
                 @Override
@@ -111,31 +112,6 @@ public class MainActivity extends AppCompatActivity
             builder.show();
         } else if (id == R.id.nav_donate)
         {
-            {
-                new Thread()
-                {
-                    @Override
-                    public void run()
-                    {
-                        super.run();
-                        Socket socket = new Socket();
-                        try
-                        {
-                            socket.connect(new InetSocketAddress("zlpingguo.com", 80));
-                            OutputStream outputStream = socket.getOutputStream();
-                            InputStream inputStream = socket.getInputStream();
-                            outputStream.write("GET / HTTP/1.1\r\nHost: www.zlpingguo.com\r\n\r\n".getBytes());
-                            byte[] buffer = new byte[4096];
-                            inputStream.read(buffer);
-                            String txt = new String(buffer);
-                            Log.d("zlpingguo", txt);
-                        } catch (IOException e)
-                        {
-                            e.printStackTrace();
-                        }
-                    }
-                }.start();
-            }
             Builder builder=new Builder(this);
             builder.setTitle("捐赠支持");
             builder.setMessage("暂未开放捐赠，欢迎 Github 点赞。");
