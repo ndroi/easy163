@@ -27,7 +27,7 @@ WLAN -> 连接的 WLAN -> 代理 -> 手动
 本软件为实验性项目，请勿用于非法用途      
 目前版本未能测试各个版本的网易云，请测试后反馈问题    
 
-感谢 [https://github.com/nondanee/UnblockNeteaseMusic] 提供 NodeJS 版网易云助手，
+感谢 [https://github.com/nondanee/UnblockNeteaseMusic] 提供 NodeJS 版网易云助手，  
 本项目参考其大量业务逻辑，包括 APP 图标。
 
 感谢 [https://github.com/alanzplus/HTTP-Proxy/tree/master/nio-http-proxy] 实现了高性能的 NIO HTTP 代理
