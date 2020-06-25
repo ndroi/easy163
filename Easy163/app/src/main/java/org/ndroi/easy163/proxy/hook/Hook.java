@@ -1,16 +1,15 @@
 package org.ndroi.easy163.proxy.hook;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
 /**
  * Created by andro on 2020/5/3.
  */
 abstract public class Hook
 {
     abstract public boolean rule(String method, String uri);
-    abstract public byte[] hook(byte[] bytes) throws Exception;
+
+    public void hookRequest(RequestHookData data) throws Exception { }
+
+    public void hookResponse(ResponseHookData data) throws Exception { }
 
     /* http://www.baidu.com/xyz?id=x --> /xyz */
     protected String uri2Path(String uri)

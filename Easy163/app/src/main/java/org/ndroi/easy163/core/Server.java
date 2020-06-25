@@ -1,6 +1,7 @@
 package org.ndroi.easy163.core;
 
 import org.ndroi.easy163.hooks.CloseHook;
+import org.ndroi.easy163.hooks.CollectHook;
 import org.ndroi.easy163.hooks.DownloadHook;
 import org.ndroi.easy163.hooks.MiguFileHook;
 import org.ndroi.easy163.hooks.PlaylistHook;
@@ -22,6 +23,7 @@ public class Server
     {
         proxy.addHook(new PlaylistHook());
         proxy.addHook(new SongPlayHook());
+        proxy.addHook(new CollectHook());
         proxy.addHook(new DownloadHook());
         proxy.addHook(new MiguFileHook());
         proxy.addHook(new CloseHook());
@@ -44,8 +46,8 @@ public class Server
     {
         /* for some bugs, and the reasons are not known clearly */
         proxy.addHttpBlock("127.0.0.1:" + port);
-        proxy.addHttpBlock("localhost:" + port);
         proxy.addHttpBlock("127.0.0.1:2017");
+        proxy.addHttpBlock("localhost:" + port);
         proxy.addHttpBlock("localhost:2017");
         /* block log upload */
         proxy.addHttpBlock("clientlog3.music.163.com");
@@ -56,7 +58,7 @@ public class Server
 
     private void protectMyself()
     {
-        /* make this app bypass proxy */
+        /* make this app self bypass proxy */
         System.clearProperty("http.proxyHost");
         System.clearProperty("http.proxyPort");
         System.clearProperty("https.proxyHost");

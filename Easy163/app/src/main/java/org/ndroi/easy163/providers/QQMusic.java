@@ -45,7 +45,7 @@ public class QQMusic extends Provider
             String title = info.getString("title");
             if(title.toLowerCase().endsWith("(live)"))
             {
-                Log.d("QQMusic", "Skip Live Version");
+                Log.d("QQMusic", "Ignore Live Version");
                 continue;
             }
             Keyword candidateKeyword = new Keyword();

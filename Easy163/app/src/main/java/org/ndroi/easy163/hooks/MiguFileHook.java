@@ -1,6 +1,7 @@
 package org.ndroi.easy163.hooks;
 
 import org.ndroi.easy163.proxy.hook.Hook;
+import org.ndroi.easy163.proxy.hook.ResponseHookData;
 
 public class MiguFileHook extends Hook
 {
@@ -11,8 +12,8 @@ public class MiguFileHook extends Hook
     }
 
     @Override
-    public byte[] hook(byte[] bytes)
+    public void hookResponse(ResponseHookData data)
     {
-        return bytes;
+        data.setCode("206");
     }
 }

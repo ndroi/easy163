@@ -11,9 +11,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by andro on 2020/5/3.
@@ -23,9 +21,15 @@ public class HookManager
     private ProxyContext context;
     private Hook hook;
     private List<String> RequestHeaderToRemove = Arrays.asList(
+            "Connection",
             "Proxy-Connection",
             "Accept-Encoding",
-            "x-napm-retry");
+            "X-NAPM-RETRY");
+    private List<String> ResponseHeaderToRemove = Arrays.asList(
+            null,
+            "Transfer-Encoding",
+            "Content-Encoding");
+
     public HookManager(ProxyContext context, Hook hook)
     {
         this.context = context;
@@ -40,7 +44,6 @@ public class HookManager
             {
                 super.run();
                 Request request = receiveRequest();
-                Log.d("request", request.getMethod() + " " + request.getUri());
                 HttpURLConnection connection = getRemoteConnection(request);
                 writeBack(connection);
             }
@@ -52,14 +55,20 @@ public class HookManager
         Request request = new Request();
         ChannelBuffer channelBuffer = context.getConnectionBuffer().upstream();
         ByteBuffer byteBuffer = channelBuffer.getInternalBuffer();
-        while (!request.finished())
+        while (true)
         {
             byteBuffer.flip();
             byte[] bytes = new byte[byteBuffer.limit()];
             byteBuffer.get(bytes);
+            Log.d("receiveRequest::phase_1", new String(bytes));
             request.putBytes(bytes);
+            if(request.finished())
+            {
+                break;
+            }
             byteBuffer.clear();
             int readLen = context.getClient().read(channelBuffer);
+            Log.d("receiveRequest::phase_2", new String(bytes));
             if(readLen == -1)
             {
                 context.getClient().closeIO();
@@ -80,25 +89,41 @@ public class HookManager
 
     private HttpURLConnection getRemoteConnection(Request request)
     {
+        RequestHookData requestHookData = new RequestHookData();
+        for (String key : request.getHeaderFields().keySet())
+        {
+            if(!RequestHeaderToRemove.contains(key))
+            {
+                requestHookData.getHeaderFields().put(key, request.getHeaderFields().get(key));
+            }
+        }
+        requestHookData.setMethod(request.getMethod());
+        requestHookData.setUri(request.getUri());
+        requestHookData.setVersion(request.getVersion());
+        if(requestHookData.getMethod().equals("POST"))
+        {
+            requestHookData.setContent(request.getContent());
+        }
         HttpURLConnection connection = null;
         try
         {
-            connection = (HttpURLConnection) new URL(request.getUri()).openConnection();
-            connection.setRequestMethod(request.getMethod());
-            for (String key : request.getHeaderFields().keySet())
+            hook.hookRequest(requestHookData);
+            connection = (HttpURLConnection) new URL(requestHookData.getUri()).openConnection();
+            connection.setRequestMethod(requestHookData.getMethod());
+            for (String key : requestHookData.getHeaderFields().keySet())
             {
-                if(!RequestHeaderToRemove.contains(key))
-                {
-                    connection.setRequestProperty(key, request.getHeaderFields().get(key));
-                }
+                connection.setRequestProperty(key, requestHookData.getHeaderFields().get(key));
             }
             connection.setRequestProperty("Connection", "Close");
             connection.connect();
-            if(request.getMethod().equals("POST"))
+            if(requestHookData.getMethod().equals("POST"))
             {
-                request.writeContentTo(connection.getOutputStream());
+                connection.getOutputStream().write(requestHookData.getContent());
             }
         } catch (IOException e)
+        {
+            e.printStackTrace();
+        } catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -107,18 +132,15 @@ public class HookManager
 
     private void writeBack(HttpURLConnection connection)
     {
-        Map<String, String> headerFields = new LinkedHashMap<>();
+        ResponseHookData responseHookData = new ResponseHookData();
+        String responseLine = connection.getHeaderFields().get(null).get(0);
+        responseHookData.applyResponseLine(responseLine);
         for (String key : connection.getHeaderFields().keySet())
         {
-            headerFields.put(key, connection.getHeaderFields().get(key).get(0));
-        }
-        String responseLine = headerFields.get(null);
-        headerFields.remove(null);
-        headerFields.remove("Transfer-Encoding");
-        headerFields.remove("Content-Encoding");
-        if(headerFields.containsKey("Content-Range"))
-        {
-            responseLine = responseLine.replace("200", "206");
+            if(!ResponseHeaderToRemove.contains(key))
+            {
+                responseHookData.getHeaderFields().put(key, connection.getHeaderFields().get(key).get(0));
+            }
         }
         try
         {
@@ -132,35 +154,35 @@ public class HookManager
             {
                 inputStream = connection.getErrorStream();
             }
-            byte[] buffer = new byte[4096];
+            byte[] bytes = new byte[4096];
             while (true)
             {
-                int len = inputStream.read(buffer);
+                int len = inputStream.read(bytes);
                 if(len == -1) break;
-                byteArrayOutputStream.write(buffer, 0, len);
+                byteArrayOutputStream.write(bytes, 0, len);
             }
-            byte[] content = byteArrayOutputStream.toByteArray();
+            responseHookData.setContent(byteArrayOutputStream.toByteArray());
             try
             {
-                content = hook.hook(content);
+                hook.hookResponse(responseHookData);
+                responseHookData.getHeaderFields().put("Content-Length", responseHookData.getContent().length + "");
             }catch (Exception e)
             {
-                Log.d("hook", "Hook failed");
+                Log.d("hookResponse", "Hook failed");
+                e.printStackTrace();
             }
             byteArrayOutputStream.reset();
-            headerFields.put("Content-Length", content.length + "");
-            byteArrayOutputStream.write((responseLine + "\r\n").getBytes());
-            for (String key : headerFields.keySet())
+            byteArrayOutputStream.write((responseHookData.generateResponseLine() + "\r\n").getBytes());
+            for (String key : responseHookData.getHeaderFields().keySet())
             {
-                String value = headerFields.get(key);
+                String value = responseHookData.getHeaderFields().get(key);
                 String item = key + ": " + value + "\r\n";
                 byteArrayOutputStream.write(item.getBytes());
             }
             byteArrayOutputStream.write("\r\n".getBytes());
             byteArrayOutputStream.close();
-            byte[] header = byteArrayOutputStream.toByteArray();
-            doWriteBack(header);
-            doWriteBack(content);
+            doWriteBack(byteArrayOutputStream.toByteArray());
+            doWriteBack(responseHookData.getContent());
             context.getClient().closeIO();
         } catch (IOException e)
         {

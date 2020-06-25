@@ -3,6 +3,7 @@ package org.ndroi.easy163.proxy.hook;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -45,6 +46,13 @@ public class Request
             return false;
         }
         return byteArrayOutputStream.size() >= headerLen + contentLen;
+    }
+
+    public byte[] getContent()
+    {
+        byte[] content = new byte[contentLen];
+        System.arraycopy(byteArrayOutputStream.toByteArray(), headerLen, content, 0, contentLen);
+        return content;
     }
 
     public void writeContentTo(OutputStream outputStream)
@@ -112,13 +120,13 @@ public class Request
         byte[] bytes = byteArrayOutputStream.toByteArray();
         String headerStr = new String(bytes, 0, headerLen - 4);
         String[] lines = headerStr.split("\r\n");
-        String first_line = lines[0];
-        int _p = first_line.indexOf(' ');
-        method = first_line.substring(0, _p);
-        first_line = first_line.substring(_p + 1);
-        _p = first_line.indexOf(' ');
-        uri = first_line.substring(0, _p);
-        version = first_line.substring(_p + 1);
+        String requestLine = lines[0];
+        int _p = requestLine.indexOf(' ');
+        method = requestLine.substring(0, _p);
+        requestLine = requestLine.substring(_p + 1);
+        _p = requestLine.indexOf(' ');
+        uri = requestLine.substring(0, _p);
+        version = requestLine.substring(_p + 1);
         for(int i = 1; i < lines.length; i++)
         {
             String line = lines[i];

@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.hooks.utils.JsonUtil;
 import org.ndroi.easy163.proxy.hook.Hook;
+import org.ndroi.easy163.proxy.hook.ResponseHookData;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Keyword;
 import java.util.Arrays;
@@ -30,8 +31,9 @@ public class PlaylistHook extends Hook
             "/eapi/batch",
             "/artist/privilege",
             "/eapi/artist/top/song",
-            "/api/v3/song/detail",
-            "/eapi/song/enhance/privilege"
+            "/eapi/v3/song/detail",
+            "/eapi/song/enhance/privilege",
+            "/eapi/song/enhance/info/get"
     );
 
     @Override
@@ -54,16 +56,15 @@ public class PlaylistHook extends Hook
     }
 
     @Override
-    public byte[] hook(byte[] bytes)
+    public void hookResponse(ResponseHookData data)
     {
-        bytes = Crypto.aesDecrypt(bytes);
+        byte[] bytes = Crypto.aesDecrypt(data.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         cacheKeywords(jsonObject);
         modifyPrivileges(jsonObject);
-        Log.d("PlaylistHook", jsonObject.toString());
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        return bytes;
+        data.setContent(bytes);
     }
 
     private void cacheKeywords(JSONObject jsonObject)

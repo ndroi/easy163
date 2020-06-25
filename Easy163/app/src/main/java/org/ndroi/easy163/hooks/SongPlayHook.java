@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.hooks.utils.ConcurrencyTask;
 import org.ndroi.easy163.proxy.hook.Hook;
 import org.ndroi.easy163.core.Cache;
+import org.ndroi.easy163.proxy.hook.ResponseHookData;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Song;
 
@@ -71,13 +72,13 @@ public class SongPlayHook extends Hook
     }
 
     @Override
-    public byte[] hook(byte[] bytes) throws Exception
+    public void hookResponse(ResponseHookData data) throws Exception
     {
-        bytes = Crypto.aesDecrypt(bytes);
+        byte[] bytes = Crypto.aesDecrypt(data.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleNoFreeSong(jsonObject);
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        return bytes;
+        data.setContent(bytes);
     }
 }

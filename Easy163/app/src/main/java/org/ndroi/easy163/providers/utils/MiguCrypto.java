@@ -28,7 +28,6 @@ public class MiguCrypto
             "KTYBNJe9EJMMs2l2aOKPHQCl05QDDfO4wJpzwwL4IFag5u%2FAWY81MZ6SJJpD1gUEw6fVqENIQowg" +
             "0bSjZwkY61kY0EIvDNsEZ9TbqFCiy25RXb%2BaLWgcRGE%3D";
     private static Cipher aesCipher = null;
-    private static Cipher rsaCipher = null;
 
     private static void initAes()
     {
@@ -69,7 +68,7 @@ public class MiguCrypto
         {
             aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             aesCipher.init(Cipher.ENCRYPT_MODE, keySpec, new IvParameterSpec(sIv));
-        }catch (InvalidKeyException e)
+        } catch (InvalidKeyException e)
         {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e)

@@ -9,10 +9,4 @@ public class CloseHook extends Hook
     {
         return uri2Host(uri).endsWith("music.163.com");
     }
-
-    @Override
-    public byte[] hook(byte[] bytes)
-    {
-        return bytes;
-    }
 }

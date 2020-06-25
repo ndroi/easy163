@@ -10,16 +10,17 @@ import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /* search Song from providers */
 public class Search
 {
-    private static Provider[] providers = new Provider[]{
+    private static List<Provider> providers = Arrays.asList(
             new QQMusic(),
             new KuwoMusic(),
-            new MiguMusic(),
-    };
+            new MiguMusic()
+    );
 
     public static Song search(Keyword keyword)
     {

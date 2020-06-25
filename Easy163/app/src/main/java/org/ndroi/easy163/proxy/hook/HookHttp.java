@@ -49,15 +49,15 @@ public class HookHttp
         hooks.add(hook);
     }
 
-    /* only apply the fist match hook */
+    /* only apply the first matched hookResponse */
     public boolean checkAndHookTarget(ProxyContext context, String method, String uri)
     {
-        Log.d("hook check", uri);
+        Log.d("hookResponse check", uri);
         for (Hook hook : hooks)
         {
             if (hook.rule(method, uri))
             {
-                Log.d("hook match", uri);
+                Log.d("hookResponse match", uri);
                 new HookManager(context, hook).asyncHook();
                 return true;
             }
