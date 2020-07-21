@@ -1,16 +1,13 @@
 package org.ndroi.easy163.hooks;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.ndroi.easy163.core.Cache;
-import org.ndroi.easy163.providers.utils.Stream2Bytes;
-import org.ndroi.easy163.proxy.hook.Hook;
-import org.ndroi.easy163.proxy.hook.RequestHookData;
-import org.ndroi.easy163.proxy.hook.ResponseHookData;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Song;
+import org.ndroi.easy163.vpn.hookhttp.Request;
+import org.ndroi.easy163.vpn.hookhttp.Response;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,32 +19,35 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by andro on 2020/5/6.
  */
-public class DownloadHook extends Hook
+public class DownloadHook extends BaseHook
 {
     @Override
-    public boolean rule(String method, String uri)
+    public boolean rule(Request request)
     {
-        if(!method.equals("POST") || !uri2Host(uri).endsWith("music.163.com"))
+        String method = request.getMethod();
+        String host = request.getHeaderFields().get("Host");
+        if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
         }
-        String path = uri2Path(uri);
+        String path = getPath(request);
         return path.endsWith("/song/enhance/download/url");
     }
 
     @Override
-    public void hookRequest(RequestHookData data) throws Exception
+    public void hookRequest(Request request)
     {
-        Crypto.Request request = Crypto.decryptRequestBody(new String(data.getContent()));
-        Log.d("hookRequest::path", request.path);
-        Log.d("hookRequest::json", request.json.toString());
-        request.path = "/api/song/enhance/player/url";
-        String id = request.json.getString("id");
-        request.json.put("ids", "[\"" + id + "\"]");
-        request.json.remove("id");
-        byte[] bytes = Crypto.encryptRequestBody(request).getBytes();
-        data.setUri("http://music.163.com/eapi/song/enhance/player/url");
-        data.setContent(bytes);
+        super.hookRequest(request);
+        Crypto.Request cryptoRequest = Crypto.decryptRequestBody(new String(request.getContent()));
+        //Log.d("hookRequest::path", request.path);
+        //Log.d("hookRequest::json", request.json.toString());
+        cryptoRequest.path = "/api/song/enhance/player/url";
+        String id = cryptoRequest.json.getString("id");
+        cryptoRequest.json.put("ids", "[\"" + id + "\"]");
+        cryptoRequest.json.remove("id");
+        byte[] bytes = Crypto.encryptRequestBody(cryptoRequest).getBytes();
+        request.setUri("http://music.163.com/eapi/song/enhance/player/url");
+        request.setContent(bytes);
     }
 
     private String preDownloadForMd5(String url)
@@ -67,7 +67,7 @@ public class DownloadHook extends Hook
                 while (true)
                 {
                     int readLen = inputStream.read(bytes);
-                    if(readLen == -1)
+                    if (readLen == -1)
                     {
                         break;
                     }
@@ -97,22 +97,24 @@ public class DownloadHook extends Hook
     {
         JSONObject songObject = null;
         Object object = jsonObject.get("data");
-        if(object.getClass().equals(JSONArray.class))
+        if (object.getClass().equals(JSONArray.class))
         {
-            songObject = ((JSONArray)object).getJSONObject(0);
+            songObject = ((JSONArray) object).getJSONObject(0);
             jsonObject.put("data", songObject);
         } else
         {
-            songObject = (JSONObject)object;
+            songObject = (JSONObject) object;
         }
-        if(songObject.getString("url") == null || songObject.getIntValue("code") != 200)
+        if (songObject.getString("url") == null ||
+                songObject.getIntValue("code") != 200 ||
+                songObject.getJSONObject("freeTrialInfo") != null)
         {
             String id = songObject.getString("id");
             Song providerSong = (Song) Cache.providerSongs.get(id);
-            if(providerSong.md5.isEmpty())
+            if (providerSong.md5.isEmpty())
             {
                 providerSong.md5 = preDownloadForMd5(providerSong.url);
-                Log.d("DownloadHook", "Pre-download for md5: " + providerSong.md5);
+                //Log.d("DownloadHook", "Pre-download for md5: " + providerSong.md5);
             }
             songObject.put("code", 200);
             songObject.put("url", providerSong.url);
@@ -124,18 +126,19 @@ public class DownloadHook extends Hook
             songObject.put("type", "mp3");
             songObject.put("encodeType", "mp3");
         }
-        songObject.put("fee", 0) ;
+        songObject.put("fee", 0);
         songObject.put("flag", 0);
     }
 
     @Override
-    public void hookResponse(ResponseHookData data) throws Exception
+    public void hookResponse(Response response)
     {
-        byte[] bytes = Crypto.aesDecrypt(data.getContent());
+        super.hookResponse(response);
+        byte[] bytes = Crypto.aesDecrypt(response.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleDownload(jsonObject);
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        data.setContent(bytes);
+        response.setContent(bytes);
     }
 }

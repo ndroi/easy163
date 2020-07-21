@@ -33,22 +33,22 @@ public class BitRate
     public static int Detect(byte[] bytes)
     {
         int ptr = 0;
-        if(bytes[0] == 'f' && bytes[1] == 'L' && bytes[2] == 'a' && bytes[3] == 'C')
+        if (bytes[0] == 'f' && bytes[1] == 'L' && bytes[2] == 'a' && bytes[3] == 'C')
         {
             return 999;
         }
-        if(bytes[0] == 'I' && bytes[1] == 'D' && bytes[2] == '3')
+        if (bytes[0] == 'I' && bytes[1] == 'D' && bytes[2] == '3')
         {
             ptr = 6;
             int size = 0;
-            for(int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 size += (bytes[ptr + i] & 0x7f) << (7 * (3 - i));
             }
             ptr = 10 + size;
         }
         int version = ((bytes[ptr + 1] & 0xff) >> 3) & 0x3;
-        int layer = ((bytes[ptr + 1]  & 0xff) >> 1) & 0x3;
+        int layer = ((bytes[ptr + 1] & 0xff) >> 1) & 0x3;
         int bitrate = (bytes[ptr + 2] & 0xff) >> 4;
         int result = table.get(version).get(layer)[bitrate];
         return result;

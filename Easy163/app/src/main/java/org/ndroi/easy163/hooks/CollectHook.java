@@ -2,31 +2,34 @@ package org.ndroi.easy163.hooks;
 
 import com.alibaba.fastjson.JSONObject;
 
-import org.ndroi.easy163.proxy.hook.Hook;
-import org.ndroi.easy163.proxy.hook.ResponseHookData;
 import org.ndroi.easy163.utils.Crypto;
+import org.ndroi.easy163.vpn.hookhttp.Request;
+import org.ndroi.easy163.vpn.hookhttp.Response;
 
-public class CollectHook extends Hook
+public class CollectHook extends BaseHook
 {
     @Override
-    public boolean rule(String method, String uri)
+    public boolean rule(Request request)
     {
-        if(!method.equals("POST") || !uri2Host(uri).endsWith("music.163.com"))
+        String method = request.getMethod();
+        String host = request.getHeaderFields().get("Host");
+        if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
         }
-        String path = uri2Path(uri);
+        String path = getPath(request);
         return path.endsWith("/playlist/manipulate/tracks");
     }
 
     @Override
-    public void hookResponse(ResponseHookData data) throws Exception
+    public void hookResponse(Response response)
     {
-        byte[] bytes = Crypto.aesDecrypt(data.getContent());
+        super.hookResponse(response);
+        byte[] bytes = Crypto.aesDecrypt(response.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         jsonObject.put("code", 200);
         jsonObject.remove("message");
-        if(jsonObject.getString("trackIds") == null)
+        if (jsonObject.getString("trackIds") == null)
         {
             jsonObject.put("trackIds", "[999999]");
             jsonObject.put("count", 999);
@@ -34,6 +37,6 @@ public class CollectHook extends Hook
         }
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        data.setContent(bytes);
+        response.setContent(bytes);
     }
 }

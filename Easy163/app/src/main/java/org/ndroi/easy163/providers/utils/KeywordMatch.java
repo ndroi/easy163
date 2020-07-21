@@ -23,7 +23,7 @@ public class KeywordMatch
         {
             for (String bSinger : b.singers)
             {
-                if(match(aSinger, bSinger))
+                if (match(aSinger, bSinger))
                 {
                     return true;
                 }

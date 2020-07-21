@@ -1,17 +1,22 @@
 package org.ndroi.easy163.providers.utils;
 
 import android.util.Base64;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.security.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by andro on 2020/5/6.
@@ -41,16 +46,16 @@ public class MiguCrypto
             MessageDigest messageDigest = MessageDigest.getInstance("md5");
             for (int i = 0; i < repeat; i++)
             {
-                if(byteList.isEmpty())
+                if (byteList.isEmpty())
                 {
                     messageDigest.update(ps);
                     byteList.add(messageDigest.digest());
-                }else
+                } else
                 {
                     byte[] last = byteList.get(byteList.size() - 1);
                     byte[] buffer = new byte[last.length + ps.length];
-                    System.arraycopy(last, 0, buffer,0, last.length);
-                    System.arraycopy(ps, 0, buffer,last.length, ps.length);
+                    System.arraycopy(last, 0, buffer, 0, last.length);
+                    System.arraycopy(ps, 0, buffer, last.length, ps.length);
                     messageDigest.update(buffer);
                     byteList.add(messageDigest.digest());
                 }
@@ -59,9 +64,9 @@ public class MiguCrypto
         {
             e.printStackTrace();
         }
-        byte[] skey = new byte[16*2];
-        System.arraycopy(byteList.get(0), 0, skey,0, 16);
-        System.arraycopy(byteList.get(1), 0, skey,16, 16);
+        byte[] skey = new byte[16 * 2];
+        System.arraycopy(byteList.get(0), 0, skey, 0, 16);
+        System.arraycopy(byteList.get(1), 0, skey, 16, 16);
         byte[] sIv = byteList.get(2);
         SecretKeySpec keySpec = new SecretKeySpec(skey, "AES");
         try
@@ -85,7 +90,7 @@ public class MiguCrypto
 
     public static String Encrypt(String text)
     {
-        if(aesCipher == null)
+        if (aesCipher == null)
         {
             initAes();
         }

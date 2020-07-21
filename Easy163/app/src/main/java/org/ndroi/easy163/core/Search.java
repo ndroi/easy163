@@ -26,7 +26,7 @@ public class Search
     {
         List<Song> songs = new ArrayList<>();
         List<Thread> threads = new ArrayList<>();
-        for(Provider provider : providers)
+        for (Provider provider : providers)
         {
             Thread thread = new Thread()
             {
@@ -35,7 +35,7 @@ public class Search
                 {
                     super.run();
                     Song song = provider.match(keyword);
-                    if(song != null)
+                    if (song != null)
                     {
                         synchronized (songs)
                         {
@@ -47,12 +47,12 @@ public class Search
             thread.start();
             threads.add(thread);
         }
-        long startTime =  System.currentTimeMillis();
-        /* just busy wait: first finish or 10 sec */
+        long startTime = System.currentTimeMillis();
+        /* just busy wait util first finish or 10 seconds */
         while (songs.isEmpty())
         {
-            long endTime =  System.currentTimeMillis();
-            if(endTime - startTime > 10*1000)
+            long endTime = System.currentTimeMillis();
+            if (endTime - startTime > 10 * 1000)
             {
                 break;
             }
@@ -62,11 +62,11 @@ public class Search
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
-            } 
+            }
         }
-        if(!songs.isEmpty())
+        if (!songs.isEmpty())
         {
-            Log.d("search","from provider: " + songs.get(0).url + "/" + songs.get(0).md5);
+            Log.d("search", "from provider: " + songs.get(0).url + "/" + songs.get(0).md5);
             return songs.get(0);
         }
         return null;

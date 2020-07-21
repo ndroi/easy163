@@ -1,15 +1,18 @@
 package org.ndroi.easy163.utils;
 
 import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
+
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Created by andro on 2020/5/3.
@@ -20,6 +23,7 @@ public class Crypto
     private static SecretKeySpec key = new SecretKeySpec(aes_key.getBytes(), "AES");
     private static Cipher decryptCipher = null;
     private static Cipher encryptCipher = null;
+
     static
     {
         try
@@ -79,7 +83,7 @@ public class Crypto
         for (int i = 0; i < len; i += 2)
         {
             bytes[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) +
-                    Character.digit(hexString.charAt(i+1), 16));
+                    Character.digit(hexString.charAt(i + 1), 16));
         }
         return bytes;
     }

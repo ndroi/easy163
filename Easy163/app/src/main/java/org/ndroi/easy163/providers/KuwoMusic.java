@@ -1,17 +1,15 @@
 package org.ndroi.easy163.providers;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.ndroi.easy163.providers.utils.KeywordMatch;
+import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-import org.ndroi.easy163.providers.utils.Stream2Bytes;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -26,12 +24,12 @@ public class KuwoMusic extends Provider
     {
         String query = keyword2Query(keyword);
         String token = getToken(query);
-        if(token == null)
+        if (token == null)
         {
             return null;
         }
         String mId = getmId(query, token, keyword);
-        if(mId == null)
+        if (mId == null)
         {
             return null;
         }
@@ -41,13 +39,13 @@ public class KuwoMusic extends Provider
 
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
     {
-        for(Object infoObj : candidates)
+        for (Object infoObj : candidates)
         {
             JSONObject info = (JSONObject) infoObj;
             Keyword candidateKeyword = new Keyword();
             candidateKeyword.songName = info.getString("name");
             candidateKeyword.singers.add(info.getString("artist"));
-            if(KeywordMatch.match(keyword, candidateKeyword))
+            if (KeywordMatch.match(keyword, candidateKeyword))
             {
                 return info;
             }
@@ -64,7 +62,7 @@ public class KuwoMusic extends Provider
         {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("user-agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36");
+            connection.setRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36");
             connection.connect();
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
@@ -75,7 +73,7 @@ public class KuwoMusic extends Provider
                 int p2 = cookie.indexOf(";");
                 token = cookie.substring(p1, p2);
             }
-        }catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -98,27 +96,27 @@ public class KuwoMusic extends Provider
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
+                byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
-                if(jsonObject.getIntValue("code") == 200)
+                if (jsonObject.getIntValue("code") == 200)
                 {
                     JSONArray candidates = jsonObject.getJSONObject("data").getJSONArray("list");
                     JSONObject best = selectBestMatch(candidates, keyword);
-                    if(best != null)
+                    if (best != null)
                     {
                         mId = best.getString("musicrid");
                     }
                 }
             }
-        }catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }
         return mId;
     }
 
-    private Song getSong(String  MId)
+    private Song getSong(String MId)
     {
         Song song = null;
         String url = "http://antiserver.kuwo.cn/anti.s?type=convert_url&format=mp3&response=url&rid=" + MId;
@@ -130,14 +128,14 @@ public class KuwoMusic extends Provider
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
+                byte[] content = ReadStream.read(connection.getInputStream());
                 String songUrl = new String(content);
-                if(songUrl.startsWith("http"))
+                if (songUrl.startsWith("http"))
                 {
                     song = generateSong(songUrl);
                 }
             }
-        }catch (IOException e)
+        } catch (IOException e)
         {
             e.printStackTrace();
         }

@@ -5,13 +5,4 @@
     <string name="nav_header_title">easy163</string>
     <string name="nav_header_subtitle">github.com/ndroi</string>
     <string name="nav_header_desc">Navigation header</string>
-    <string name="usage"> \n
-        服务开启后，请如下手动设置系统代理：\n
-        主机：127.0.0.1 端口：8163 \n
-        以 MIUI 为例： \n
-        WLAN -> 连接的 WLAN -> 代理 -> 手动 \n
-        如遇到设备网络异常请取消代理设置并关闭本软件 \n
-        如无法使用请重启网易云 \n
-        本软件关闭时，请关闭系统代理，否则将导致网络故障 \n"
-    </string>
 </resources>

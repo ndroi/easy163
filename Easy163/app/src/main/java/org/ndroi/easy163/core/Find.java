@@ -1,7 +1,8 @@
 package org.ndroi.easy163.core;
 
 import com.alibaba.fastjson.JSONObject;
-import org.ndroi.easy163.providers.utils.Stream2Bytes;
+
+import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 
 import java.io.IOException;
@@ -21,18 +22,18 @@ public class Find
             connection.setRequestMethod("GET");
             connection.connect();
             int responseCode = connection.getResponseCode();
-            if(responseCode == HttpURLConnection.HTTP_OK)
+            if (responseCode == HttpURLConnection.HTTP_OK)
             {
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
+                byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 JSONObject songObj = jsonObject.getJSONArray("songs")
                         .getJSONObject(0);
                 keyword = new Keyword();
                 keyword.songName = songObj.getString("name");
-                for(Object singerObj : songObj.getJSONArray("artists"))
+                for (Object singerObj : songObj.getJSONArray("artists"))
                 {
-                    JSONObject singer = (JSONObject)singerObj;
+                    JSONObject singer = (JSONObject) singerObj;
                     keyword.singers.add(singer.getString("name"));
                 }
             }

@@ -3,9 +3,10 @@ package org.ndroi.easy163.ui;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
+import android.net.VpnService;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,18 +19,16 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.ndroi.easy163.R;
+import org.ndroi.easy163.core.Server;
+import org.ndroi.easy163.vpn.LocalVPNService;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-
-import static android.support.v7.app.AlertDialog.*;
+import static android.support.v7.app.AlertDialog.Builder;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ToggleButton.OnCheckedChangeListener
 {
+    private static final int VPN_REQUEST_CODE = 0x0F;
+    private boolean waitingForVPNStart;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -46,9 +44,10 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         ToggleButton toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
+
+        Server.getInstance().start();
     }
 
     @Override
@@ -68,9 +67,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item)
     {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.nav_github)
         {
             Uri uri = Uri.parse("https://github.com/ndroi/easy163");
@@ -78,16 +75,13 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
         } else if (id == R.id.nav_usage)
         {
-            Builder builder=new Builder(this);
+            Builder builder = new Builder(this);
             builder.setTitle("使用说明");
-            builder.setMessage("开启本软件后，设置系统代理为：\n" +
-                    "主机：127.0.0.1 \n" +
-                    "端口：8163 \n" +
-                    "如 MIUI：\n" +
-                    "WLAN -> 连接的 WLAN -> 代理 -> 手动 。\n" +
-                    "如无法使用请重启网易云。\n" +
-                    "开启本软件后如遇到设备网络异常请取消代理设置并关闭本软件。");
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
+                    "如无法使用请重启音乐软件\n" +
+                    "如遇到设备网络异常请关闭本软件");
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+            {
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
@@ -97,12 +91,11 @@ public class MainActivity extends AppCompatActivity
             builder.show();
         } else if (id == R.id.nav_statement)
         {
-            Builder builder=new Builder(this);
+            Builder builder = new Builder(this);
             builder.setTitle("免责声明");
-            builder.setMessage("本软件工作原理为在本地开启 HTTP 代理服务，拦截重定向网易云请求到其他平台。\n" +
-                    "设备所有的 HTTP 请求皆由本软件代理，如质疑其安全性欢迎阅读源码。\n" +
-                    "本软件为实验性项目，请勿用于非法用途。");
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            builder.setMessage("本软件为实验性项目\n仅提供技术研究使用\n请勿用于非法用途");
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+            {
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
@@ -112,10 +105,11 @@ public class MainActivity extends AppCompatActivity
             builder.show();
         } else if (id == R.id.nav_donate)
         {
-            Builder builder=new Builder(this);
+            Builder builder = new Builder(this);
             builder.setTitle("捐赠支持");
-            builder.setMessage("暂未开放捐赠，欢迎 Github 点赞。");
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+            builder.setMessage("暂未开放捐赠\n欢迎 Github 点赞支持");
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+            {
                 @Override
                 public void onClick(DialogInterface dialog, int which)
                 {
@@ -132,21 +126,40 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
-        Intent intent = new Intent(this, ServerService.class);
-        if(isChecked)
+        if (isChecked)
         {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                startForegroundService(intent);
-            } else
-            {
-                startService(intent);
-            }
-            Toast.makeText(this, "开启代理成功", Toast.LENGTH_SHORT).show();
-        }else
+            startVPN();
+        } else
         {
-            stopService(intent);
-            System.exit(0);
+            stopVPN();
+        }
+    }
+
+    private void startVPN()
+    {
+        Intent vpnIntent = VpnService.prepare(this);
+        if (vpnIntent != null)
+            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
+        else
+            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+    }
+
+    private void stopVPN()
+    {
+        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("stop"));
+        Log.d("stopVPN", "try to stopVPN");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            waitingForVPNStart = true;
+            Intent intent = new Intent(this, LocalVPNService.class);
+            startService(intent);
+            Toast.makeText(this, "开启 VPN 服务成功", Toast.LENGTH_SHORT).show();
         }
     }
 }

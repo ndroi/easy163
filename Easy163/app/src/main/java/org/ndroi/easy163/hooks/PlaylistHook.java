@@ -1,20 +1,23 @@
 package org.ndroi.easy163.hooks;
 
 import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
+
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.hooks.utils.JsonUtil;
-import org.ndroi.easy163.proxy.hook.Hook;
-import org.ndroi.easy163.proxy.hook.ResponseHookData;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Keyword;
+import org.ndroi.easy163.vpn.hookhttp.Request;
+import org.ndroi.easy163.vpn.hookhttp.Response;
+
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * Created by andro on 2020/5/3.
  */
-public class PlaylistHook extends Hook
+public class PlaylistHook extends BaseHook
 {
     private List<String> hosts = Arrays.asList(
             "music.163.com",
@@ -33,21 +36,25 @@ public class PlaylistHook extends Hook
             "/eapi/artist/top/song",
             "/eapi/v3/song/detail",
             "/eapi/song/enhance/privilege",
-            "/eapi/song/enhance/info/get"
+            "/eapi/song/enhance/info/get",
+            "/search/song/get",
+            "/search/complex/get/"
     );
 
     @Override
-    public boolean rule(String method, String uri)
+    public boolean rule(Request request)
     {
-        if(!method.equals("POST") || !hosts.contains(uri2Host(uri)))
+        String method = request.getMethod();
+        String host = request.getHeaderFields().get("Host");
+        //Log.d("check rule", host + request.getUri());
+        if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
         }
-        String path = uri2Path(uri);
-        Log.d("check path", path);
-        for(String p : paths)
+        String path = getPath(request);
+        for (String p : paths)
         {
-            if(path.contains(p))
+            if (path.contains(p))
             {
                 return true;
             }
@@ -56,15 +63,16 @@ public class PlaylistHook extends Hook
     }
 
     @Override
-    public void hookResponse(ResponseHookData data)
+    public void hookResponse(Response response)
     {
-        byte[] bytes = Crypto.aesDecrypt(data.getContent());
+        super.hookResponse(response);
+        byte[] bytes = Crypto.aesDecrypt(response.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         cacheKeywords(jsonObject);
         modifyPrivileges(jsonObject);
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        data.setContent(bytes);
+        response.setContent(bytes);
     }
 
     private void cacheKeywords(JSONObject jsonObject)
@@ -74,7 +82,7 @@ public class PlaylistHook extends Hook
             @Override
             public void apply(JSONObject object)
             {
-                if(object.containsKey("id") &&
+                if (object.containsKey("id") &&
                         object.containsKey("name") &&
                         object.containsKey("ar"))
                 {
@@ -99,7 +107,7 @@ public class PlaylistHook extends Hook
             @Override
             public void apply(JSONObject object)
             {
-                if(object.containsKey("st") &&
+                if (object.containsKey("st") &&
                         object.containsKey("subp") &&
                         object.containsKey("pl") &&
                         object.containsKey("dl"))
@@ -107,11 +115,11 @@ public class PlaylistHook extends Hook
                     object.put("fee", 0);
                     object.put("st", 0);
                     object.put("subp", 1);
-                    if(object.getIntValue("pl") == 0)
+                    if (object.getIntValue("pl") == 0)
                     {
                         object.put("pl", 320000);
                     }
-                    if(object.getIntValue("dl") == 0)
+                    if (object.getIntValue("dl") == 0)
                     {
                         object.put("dl", 320000);
                     }

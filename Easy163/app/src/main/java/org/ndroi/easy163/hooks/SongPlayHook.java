@@ -5,41 +5,39 @@ import android.util.Log;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
-import org.ndroi.easy163.hooks.utils.ConcurrencyTask;
-import org.ndroi.easy163.proxy.hook.Hook;
 import org.ndroi.easy163.core.Cache;
-import org.ndroi.easy163.proxy.hook.ResponseHookData;
+import org.ndroi.easy163.hooks.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Song;
+import org.ndroi.easy163.vpn.hookhttp.Request;
+import org.ndroi.easy163.vpn.hookhttp.Response;
 
 /**
  * Created by andro on 2020/5/5.
  */
-public class SongPlayHook extends Hook
+public class SongPlayHook extends BaseHook
 {
     @Override
-    public boolean rule(String method, String uri)
+    public boolean rule(Request request)
     {
-        if(!method.equals("POST") || !uri2Host(uri).endsWith("music.163.com"))
+        String method = request.getMethod();
+        String host = request.getHeaderFields().get("Host");
+        if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
         }
-        String path = uri2Path(uri);
-        if(!path.contains("/song/enhance/player/url"))
-        {
-            return false;
-        }
-        return true;
+        String path = getPath(request);
+        return path.contains("/song/enhance/player/url");
     }
 
-    private void handleNoFreeSong(JSONObject jsonObject) throws Exception
+    private void handleNoFreeSong(JSONObject jsonObject)
     {
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         JSONArray songObjects = jsonObject.getJSONArray("data");
         for (Object obj : songObjects)
         {
             JSONObject songObject = (JSONObject) obj;
-            if(songObject.getJSONObject("freeTrialInfo") != null || songObject.getIntValue("code") != 200)
+            if (songObject.getJSONObject("freeTrialInfo") != null || songObject.getIntValue("code") != 200)
             {
                 concurrencyTask.addTask(new Thread()
                 {
@@ -49,7 +47,7 @@ public class SongPlayHook extends Hook
                         super.run();
                         String id = songObject.getString("id");
                         Song providerSong = (Song) Cache.providerSongs.get(id);
-                        if(providerSong == null)
+                        if (providerSong == null)
                         {
                             Log.d("easy163", "no provider found");
                             return;
@@ -72,13 +70,14 @@ public class SongPlayHook extends Hook
     }
 
     @Override
-    public void hookResponse(ResponseHookData data) throws Exception
+    public void hookResponse(Response response)
     {
-        byte[] bytes = Crypto.aesDecrypt(data.getContent());
+        super.hookResponse(response);
+        byte[] bytes = Crypto.aesDecrypt(response.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleNoFreeSong(jsonObject);
         bytes = jsonObject.toString().getBytes();
         bytes = Crypto.aesEncrypt(bytes);
-        data.setContent(bytes);
+        response.setContent(bytes);
     }
 }

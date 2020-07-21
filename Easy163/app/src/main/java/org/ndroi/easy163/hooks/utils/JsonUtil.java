@@ -15,22 +15,22 @@ public class JsonUtil
 
     public static void traverse(Object object, Rule rule)
     {
-        if(object == null || rule == null)
+        if (object == null || rule == null)
         {
             return;
         }
-        if(object.getClass().equals(JSONObject.class))
+        if (object.getClass().equals(JSONObject.class))
         {
             JSONObject jsonObject = (JSONObject) object;
             rule.apply(jsonObject);
-            for(Object subObject : jsonObject.values())
+            for (Object subObject : jsonObject.values())
             {
                 traverse(subObject, rule);
             }
-        }else if(object.getClass().equals(JSONArray.class))
+        } else if (object.getClass().equals(JSONArray.class))
         {
             JSONArray jsonArray = (JSONArray) object;
-            for(Object subObject : jsonArray)
+            for (Object subObject : jsonArray)
             {
                 traverse(subObject, rule);
             }

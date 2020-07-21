@@ -1,6 +1,7 @@
 package org.ndroi.easy163.core;
 
 import org.ndroi.easy163.utils.Keyword;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,10 +15,9 @@ public class Cache
     {
         Object add(String id);
     }
+
     private Map<String, Object> items = new LinkedHashMap<>();
     private AddAction addAction = null;
-
-    public Cache(){}
 
     public Cache(AddAction addAction)
     {
@@ -26,7 +26,7 @@ public class Cache
 
     private void cleanExpired()
     {
-        if(items.size() > 1000)
+        if (items.size() > 1000)
         {
             String firstKey = items.keySet().iterator().next();
             items.remove(firstKey);
@@ -46,16 +46,16 @@ public class Cache
     {
         synchronized (items)
         {
-            if(items.containsKey(id))
+            if (items.containsKey(id))
             {
                 return items.get(id);
             }
-            if(addAction == null)
+            if (addAction == null)
             {
                 return null;
             }
             Object value = addAction.add(id);
-            if(value != null)
+            if (value != null)
             {
                 items.put(id, value);
             }

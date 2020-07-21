@@ -1,19 +1,21 @@
 package org.ndroi.easy163.hooks;
 
-import org.ndroi.easy163.proxy.hook.Hook;
-import org.ndroi.easy163.proxy.hook.ResponseHookData;
+import org.ndroi.easy163.vpn.hookhttp.Request;
+import org.ndroi.easy163.vpn.hookhttp.Response;
 
-public class MiguFileHook extends Hook
+public class MiguFileHook extends BaseHook
 {
     @Override
-    public boolean rule(String method, String uri)
+    public boolean rule(Request request)
     {
-        return uri2Host(uri).equals("tyst.migu.cn");
+        String host = request.getHeaderFields().get("Host");
+        return host.equals("tyst.migu.cn");
     }
 
     @Override
-    public void hookResponse(ResponseHookData data)
+    public void hookResponse(Response response)
     {
-        data.setCode("206");
+        super.hookResponse(response);
+        response.setCode("206");
     }
 }

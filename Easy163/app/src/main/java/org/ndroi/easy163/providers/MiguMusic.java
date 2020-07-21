@@ -2,11 +2,12 @@ package org.ndroi.easy163.providers;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.ndroi.easy163.providers.utils.KeywordMatch;
 import org.ndroi.easy163.providers.utils.MiguCrypto;
+import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-import org.ndroi.easy163.providers.utils.Stream2Bytes;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -34,13 +35,13 @@ public class MiguMusic extends Provider
 
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
     {
-        for(Object infoObj : candidates)
+        for (Object infoObj : candidates)
         {
             JSONObject info = (JSONObject) infoObj;
             Keyword candidateKeyword = new Keyword();
             candidateKeyword.songName = info.getString("songName");
             candidateKeyword.singers.add(info.getString("singerName"));
-            if(KeywordMatch.match(keyword, candidateKeyword))
+            if (KeywordMatch.match(keyword, candidateKeyword))
             {
                 return info;
             }
@@ -61,12 +62,12 @@ public class MiguMusic extends Provider
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
+                byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 JSONArray candidates = jsonObject.getJSONArray("musics");
                 JSONObject best = selectBestMatch(candidates, keyword);
-                if(best != null)
+                if (best != null)
                 {
                     mId = best.getString("copyrightId");
                 }
@@ -94,11 +95,11 @@ public class MiguMusic extends Provider
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
             {
-                byte[] content = Stream2Bytes.stream2Bytes(connection.getInputStream());
+                byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 String code = jsonObject.getString("returnCode");
-                if(code.equals("000000"))
+                if (code.equals("000000"))
                 {
                     String songUrl = jsonObject.getJSONObject("data").getString("playUrl");
                     song = generateSong(songUrl);
