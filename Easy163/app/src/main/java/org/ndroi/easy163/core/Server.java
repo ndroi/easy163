@@ -29,18 +29,15 @@ public class Server
 
     private void setHttpsBlock()
     {
-        BlockHttps.getInstance().addHost("music.163.com");
-        BlockHttps.getInstance().addHost("interface3.music.163.com");
-        BlockHttps.getInstance().addHost("interface.music.163.com");
-        BlockHttps.getInstance().addHost("apm.music.163.com");
-        BlockHttps.getInstance().addHost("apm3.music.163.com");
-        BlockHttps.getInstance().addHost("clientlog3.music.163.com");
-        BlockHttps.getInstance().addHost("clientlog.music.163.com");
+
     }
 
     private void setHttpBlock()
     {
-        
+        BlockHttp.getInstance().addHost("apm.music.163.com");
+        BlockHttp.getInstance().addHost("apm3.music.163.com");
+        BlockHttp.getInstance().addHost("clientlog3.music.163.com");
+        BlockHttp.getInstance().addHost("clientlog.music.163.com");
     }
 
     public void start()
