@@ -40,11 +40,7 @@ public class Server
 
     private void setHttpBlock()
     {
-        BlockHttp.getInstance().addHost("apm.music.163.com");
-        BlockHttp.getInstance().addHost("apm3.music.163.com");
-        BlockHttp.getInstance().addHost("clientlog3.music.163.com");
-        BlockHttp.getInstance().addHost("clientlog.music.163.com");
-        BlockHttp.getInstance().addHost("www.zlpingguo.com");
+        
     }
 
     public void start()
