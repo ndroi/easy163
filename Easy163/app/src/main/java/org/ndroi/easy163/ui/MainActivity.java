@@ -79,7 +79,8 @@ public class MainActivity extends AppCompatActivity
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
                     "如无法使用请重启音乐软件\n" +
-                    "如遇到设备网络异常请关闭本软件");
+                    "如遇到设备网络异常请关闭本软件\n" +
+                    "版本更新请关注 Github Release");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override

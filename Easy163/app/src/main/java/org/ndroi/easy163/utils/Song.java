@@ -13,4 +13,11 @@ public class Song
     public int br = 192000; // fake
     public String url = "";
     public String md5 = "";
+
+    @Override
+    public String toString()
+    {
+        String info = "url: " + url + "\nsize: " + size + "\nbr: " + br + "\nmd5: " + md5 + "\n";
+        return info;
+    }
 }

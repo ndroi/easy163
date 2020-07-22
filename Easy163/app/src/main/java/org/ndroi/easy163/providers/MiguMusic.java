@@ -11,13 +11,8 @@ import org.ndroi.easy163.utils.Song;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.Proxy;
 import java.net.URL;
 
-
-/**
- * Created by andro on 2020/5/3.
- */
 public class MiguMusic extends Provider
 {
     @Override
@@ -49,15 +44,23 @@ public class MiguMusic extends Provider
         return null;
     }
 
+    private void setHttpHeader(HttpURLConnection connection)
+    {
+        connection.setRequestProperty("origin", "https://music.migu.cn/");
+        connection.setRequestProperty("referer", "https://music.migu.cn/");
+        connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36");
+    }
+
     private String getMId(String query, Keyword keyword)
     {
         String mId = null;
-        String url = "http://m.music.migu.cn/migu/remoting/scr_search_tag?keyword=" +
+        String url = "https://m.music.migu.cn/migu/remoting/scr_search_tag?keyword=" +
                 query + "&type=2&rows=20&pgc=1";
         try
         {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection(Proxy.NO_PROXY);
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
+            setHttpHeader(connection);
             connection.connect();
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
@@ -81,16 +84,15 @@ public class MiguMusic extends Provider
 
     public Song getSong(String mId)
     {
-        String url = "http://music.migu.cn/v3/api/music/audioPlayer/getPlayInfo?dataType=2&";
+        String url = "https://music.migu.cn/v3/api/music/audioPlayer/getPlayInfo?dataType=2&";
         String req = "{\"copyrightId\":\"" + mId + "\",\"type\":2}";
         url = url + MiguCrypto.Encrypt(req);
         Song song = null;
         try
         {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection(Proxy.NO_PROXY);
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("origin", "http://music.migu.cn/");
-            connection.setRequestProperty("referer", "http://music.migu.cn/");
+            setHttpHeader(connection);
             connection.connect();
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK)
@@ -102,6 +104,10 @@ public class MiguMusic extends Provider
                 if (code.equals("000000"))
                 {
                     String songUrl = jsonObject.getJSONObject("data").getString("playUrl");
+                    if (!songUrl.startsWith("http:"))
+                    {
+                        songUrl = "http:" + songUrl;
+                    }
                     song = generateSong(songUrl);
                 }
             }

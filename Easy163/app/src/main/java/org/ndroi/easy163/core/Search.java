@@ -17,8 +17,8 @@ import java.util.List;
 public class Search
 {
     private static List<Provider> providers = Arrays.asList(
-            new QQMusic(),
             new KuwoMusic(),
+            new QQMusic(),
             new MiguMusic()
     );
 
@@ -66,7 +66,7 @@ public class Search
         }
         if (!songs.isEmpty())
         {
-            Log.d("search", "from provider: " + songs.get(0).url + "/" + songs.get(0).md5);
+            Log.d("search", "from provider: " + songs.get(0).toString());
             return songs.get(0);
         }
         return null;

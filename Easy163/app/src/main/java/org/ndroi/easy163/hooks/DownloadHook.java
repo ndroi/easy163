@@ -39,8 +39,6 @@ public class DownloadHook extends BaseHook
     {
         super.hookRequest(request);
         Crypto.Request cryptoRequest = Crypto.decryptRequestBody(new String(request.getContent()));
-        //Log.d("hookRequest::path", request.path);
-        //Log.d("hookRequest::json", request.json.toString());
         cryptoRequest.path = "/api/song/enhance/player/url";
         String id = cryptoRequest.json.getString("id");
         cryptoRequest.json.put("ids", "[\"" + id + "\"]");

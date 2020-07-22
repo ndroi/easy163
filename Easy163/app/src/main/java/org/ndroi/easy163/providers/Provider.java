@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import org.ndroi.easy163.providers.utils.BitRate;
+import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 
@@ -61,12 +63,8 @@ public abstract class Provider
                 {
                     song.md5 = qqMusicMd5;
                 }
-                /*
-                byte[] content = new byte[8192];
-                InputStream inputStream = connection.getInputStream();
-                inputStream.read(content);
-                inputStream.close();
-                song.br = BitRate.Detect(content);*/
+                byte[] mp3Data = ReadStream.read(connection.getInputStream());
+                song.br = BitRate.Detect(mp3Data);
             }
         } catch (IOException e)
         {

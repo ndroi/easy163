@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -28,13 +30,20 @@ public class KuwoMusic extends Provider
         {
             return null;
         }
-        String mId = getmId(query, token, keyword);
+        String mId = getMId(query, token, keyword);
         if (mId == null)
         {
             return null;
         }
         Song song = getSong(mId);
         return song;
+    }
+
+    private boolean IsOriginal(String songName)
+    {
+        int p1 = songName.indexOf('(');
+        int p2 = songName.indexOf(')');
+        return p1 != -1 && p2 != -1 && p1 < p2;
     }
 
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
@@ -44,9 +53,15 @@ public class KuwoMusic extends Provider
             JSONObject info = (JSONObject) infoObj;
             Keyword candidateKeyword = new Keyword();
             candidateKeyword.songName = info.getString("name");
+            if (IsOriginal(candidateKeyword.songName))
+            {
+                Log.d("KuwoMusic", "Ignore Non-Original Version");
+                continue;
+            }
             candidateKeyword.singers.add(info.getString("artist"));
             if (KeywordMatch.match(keyword, candidateKeyword))
             {
+                Log.d("KuwoMusic:selectBestMatch", info.toString());
                 return info;
             }
         }
@@ -80,7 +95,7 @@ public class KuwoMusic extends Provider
         return token;
     }
 
-    private String getmId(String query, String token, Keyword keyword)
+    private String getMId(String query, String token, Keyword keyword)
     {
         String mId = null;
         String url = "http://www.kuwo.cn/api/www/search/searchMusicBykeyWord?key=" +

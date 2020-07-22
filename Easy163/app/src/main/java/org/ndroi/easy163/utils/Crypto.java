@@ -1,7 +1,5 @@
 package org.ndroi.easy163.utils;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONObject;
 
 import java.security.InvalidKeyException;
@@ -115,7 +113,6 @@ public class Crypto
         byte[] encryptedBytes = hexStringToByteArray(body.substring(7));
         byte[] rawBytes = aesDecrypt(encryptedBytes);
         String text = new String(rawBytes);
-        Log.d("decryptRequestBody", text);
         String[] parts = text.split("-36cd479b6b5-");
         request.path = parts[0];
         request.json = JSONObject.parseObject(parts[1]);
@@ -145,10 +142,8 @@ public class Crypto
             e.printStackTrace();
         }
         String text = request.path + "-36cd479b6b5-" + jsonText + "-36cd479b6b5-" + digest;
-        Log.d("encryptRequestBody::text", text);
         String body = ByteArrayToHexString(aesEncrypt(text.getBytes()));
         body = "params=" + body;
-        Log.d("encryptRequestBody::body", body);
         return body;
     }
 }
