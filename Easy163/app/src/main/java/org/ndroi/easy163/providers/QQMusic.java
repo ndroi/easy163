@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-/**
- * Created by andro on 2020/5/3.
- */
 public class QQMusic extends Provider
 {
     @Override
@@ -46,7 +43,7 @@ public class QQMusic extends Provider
             String title = info.getString("title");
             if (title.toLowerCase().endsWith("(live)"))
             {
-                Log.d("QQMusic", "Ignore Live Version");
+                Log.d("QQMusic", "Skip Live Version");
                 continue;
             }
             Keyword candidateKeyword = new Keyword();

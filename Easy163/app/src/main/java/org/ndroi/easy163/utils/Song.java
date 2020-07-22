@@ -10,9 +10,9 @@ package org.ndroi.easy163.utils;
 public class Song
 {
     public int size = 10 * 1000 * 1000;
-    public int br = 192000; // fake
-    public String url = "";
-    public String md5 = "";
+    public int br = 192000;
+    public String url = "unknown";
+    public String md5 = "unknown";
 
     @Override
     public String toString()

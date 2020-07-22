@@ -4,26 +4,21 @@ import org.ndroi.easy163.providers.utils.BitRate;
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 
-/**
- * Created by andro on 2020/5/3.
- */
 public abstract class Provider
 {
     static protected String keyword2Query(Keyword keyword)
     {
-        String str = keyword.songName + " ";
+        String str = keyword.songName;
         for (String singer : keyword.singers)
         {
-            str += (singer + " ");
+            str += (" " + singer);
         }
-        str = str.trim();
         try
         {
             str = URLEncoder.encode(str, "UTF-8");

@@ -17,7 +17,6 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Server;
 import org.ndroi.easy163.vpn.LocalVPNService;
@@ -46,7 +45,6 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         ToggleButton toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
-
         Server.getInstance().start();
     }
 

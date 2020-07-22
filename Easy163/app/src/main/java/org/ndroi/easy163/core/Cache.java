@@ -1,13 +1,8 @@
 package org.ndroi.easy163.core;
 
 import org.ndroi.easy163.utils.Keyword;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-/**
- * Created by andro on 2020/5/5.
- */
 
 public class Cache
 {

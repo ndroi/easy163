@@ -1,5 +1,7 @@
 package org.ndroi.easy163.hooks;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -61,7 +63,7 @@ public class DownloadHook extends BaseHook
             {
                 MessageDigest messageDigest = MessageDigest.getInstance("md5");
                 InputStream inputStream = connection.getInputStream();
-                byte[] bytes = new byte[4096];
+                byte[] bytes = new byte[4096*2];
                 while (true)
                 {
                     int readLen = inputStream.read(bytes);
@@ -109,7 +111,7 @@ public class DownloadHook extends BaseHook
         {
             String id = songObject.getString("id");
             Song providerSong = (Song) Cache.providerSongs.get(id);
-            if (providerSong.md5.isEmpty())
+            if (providerSong.md5.equals("unknown"))
             {
                 providerSong.md5 = preDownloadForMd5(providerSong.url);
                 //Log.d("DownloadHook", "Pre-download for md5: " + providerSong.md5);

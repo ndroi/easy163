@@ -471,7 +471,7 @@ public class BioTcpHandler implements Runnable
             {
                 while (true)
                 {
-                    ByteBuffer buffer = ByteBuffer.allocate(4 * 1024);
+                    ByteBuffer buffer = ByteBuffer.allocateDirect(4 * 1024);
                     if (tunnel.destSocket == null)
                     {
                         throw new ProxyException("tunnel maybe closed");

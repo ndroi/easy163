@@ -1,35 +1,25 @@
 package org.ndroi.easy163.providers;
 
 import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import org.ndroi.easy163.providers.utils.KeywordMatch;
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by andro on 2020/5/3.
- */
 public class KuwoMusic extends Provider
 {
     @Override
     public Song match(Keyword keyword)
     {
         String query = keyword2Query(keyword);
-        String token = getToken(query);
-        if (token == null)
-        {
-            return null;
-        }
+        String token = "1234567890";
         String mId = getMId(query, token, keyword);
         if (mId == null)
         {
@@ -39,7 +29,7 @@ public class KuwoMusic extends Provider
         return song;
     }
 
-    private boolean IsOriginal(String songName)
+    private boolean IsNonOriginal(String songName)
     {
         int p1 = songName.indexOf('(');
         int p2 = songName.indexOf(')');
@@ -53,15 +43,14 @@ public class KuwoMusic extends Provider
             JSONObject info = (JSONObject) infoObj;
             Keyword candidateKeyword = new Keyword();
             candidateKeyword.songName = info.getString("name");
-            if (IsOriginal(candidateKeyword.songName))
+            if (IsNonOriginal(candidateKeyword.songName))
             {
-                Log.d("KuwoMusic", "Ignore Non-Original Version");
+                Log.d("KuwoMusic", "Skip Non-Original Version");
                 continue;
             }
             candidateKeyword.singers.add(info.getString("artist"));
             if (KeywordMatch.match(keyword, candidateKeyword))
             {
-                Log.d("KuwoMusic:selectBestMatch", info.toString());
                 return info;
             }
         }
@@ -70,7 +59,6 @@ public class KuwoMusic extends Provider
 
     private String getToken(String query)
     {
-
         String token = null;
         String url = "http://kuwo.cn/search/list?key=" + query;
         try

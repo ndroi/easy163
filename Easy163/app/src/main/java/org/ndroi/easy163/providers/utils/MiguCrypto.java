@@ -1,7 +1,6 @@
 package org.ndroi.easy163.providers.utils;
 
 import android.util.Base64;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidAlgorithmParameterException;
@@ -10,7 +9,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -23,10 +21,6 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class MiguCrypto
 {
-    private static String pubKey = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBg" +
-            "QC8asrfSaoOb4je+DSmKdriQJKWVJ2oDZrs3wi5W67m3LwTB9QVR+cE3XWU21Nx+YBxS0yu" +
-            "n8wDcjgQvYt625ZCcgin2ro/eOkNyUOTBIbuj9CvMnhUYiR61lC1f1IGbrSYYimqBVSjpifVu" +
-            "fxtx/I3exReZosTByYp4Xwpb1+WAQIDAQAB";
     private static String password = "00000000000000000000000000000000";
     private static String salt = "00000000";
     private static String skeyB64 = "OMYm0ulbQZgEd21abq1wQI7CnLeAY5CT4RPRLBmAzSUdBWgPHq3n" +

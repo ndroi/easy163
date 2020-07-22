@@ -1,10 +1,8 @@
 package org.ndroi.easy163.core;
 
 import com.alibaba.fastjson.JSONObject;
-
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;

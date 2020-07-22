@@ -18,8 +18,8 @@ public class Search
 {
     private static List<Provider> providers = Arrays.asList(
             new KuwoMusic(),
-            new QQMusic(),
-            new MiguMusic()
+            new MiguMusic(),
+            new QQMusic()
     );
 
     public static Song search(Keyword keyword)
@@ -66,7 +66,7 @@ public class Search
         }
         if (!songs.isEmpty())
         {
-            Log.d("search", "from provider: " + songs.get(0).toString());
+            Log.d("search", "from provider:\n" + songs.get(0).toString());
             return songs.get(0);
         }
         return null;

@@ -29,6 +29,7 @@ public class Server
 
     private void setHttpsBlock()
     {
+        /*not used yet*/
         BlockHttps.getInstance().addHost("music.163.com");
         BlockHttps.getInstance().addHost("interface3.music.163.com");
         BlockHttps.getInstance().addHost("interface.music.163.com");
