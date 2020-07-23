@@ -17,11 +17,6 @@ import java.util.List;
  */
 public class PlaylistHook extends BaseHook
 {
-    private List<String> hosts = Arrays.asList(
-            "music.163.com",
-            "interface.music.163.com",
-            "interface3.music.163.com"
-    );
     private List<String> paths = Arrays.asList(
             "/playlist/detail",
             "/eapi/playlist/v4/detail",
