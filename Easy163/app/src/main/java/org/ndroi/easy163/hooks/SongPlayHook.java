@@ -1,12 +1,10 @@
 package org.ndroi.easy163.hooks;
 
 import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
 import org.ndroi.easy163.core.Cache;
-import org.ndroi.easy163.hooks.utils.ConcurrencyTask;
+import org.ndroi.easy163.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.utils.Song;
 import org.ndroi.easy163.vpn.hookhttp.Request;

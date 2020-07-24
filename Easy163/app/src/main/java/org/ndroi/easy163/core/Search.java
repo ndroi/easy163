@@ -6,6 +6,7 @@ import org.ndroi.easy163.providers.KuwoMusic;
 import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
 import org.ndroi.easy163.providers.QQMusic;
+import org.ndroi.easy163.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 
@@ -24,12 +25,12 @@ public class Search
 
     public static Song search(Keyword keyword)
     {
+        Log.d("search", "start to search: " + keyword.toString());
         List<Song> songs = new ArrayList<>();
-        List<Thread> threads = new ArrayList<>();
+        ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         for (Provider provider : providers)
         {
-            Thread thread = new Thread()
-            {
+            concurrencyTask.addTask(new Thread(){
                 @Override
                 public void run()
                 {
@@ -43,17 +44,21 @@ public class Search
                         }
                     }
                 }
-            };
-            thread.start();
-            threads.add(thread);
+            });
         }
         long startTime = System.currentTimeMillis();
-        /* just busy wait util first finish or 10 seconds */
+        /* just busy wait util first search successfully or all threads finish or 10 seconds */
         while (songs.isEmpty())
         {
+            if(concurrencyTask.isAllFinished())
+            {
+                Log.d("search", "all providers finish");
+                break;
+            }
             long endTime = System.currentTimeMillis();
             if (endTime - startTime > 10 * 1000)
             {
+                Log.d("search", "timeout");
                 break;
             }
             try

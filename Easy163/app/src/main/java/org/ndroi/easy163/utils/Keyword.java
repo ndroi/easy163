@@ -10,4 +10,15 @@ public class Keyword
 {
     public String songName;
     public List<String> singers = new ArrayList<>();
+
+    @Override
+    public String toString()
+    {
+        String str = songName + ": ";
+        for (String singer : singers)
+        {
+            str += '/' + singer;
+        }
+        return str;
+    }
 }
