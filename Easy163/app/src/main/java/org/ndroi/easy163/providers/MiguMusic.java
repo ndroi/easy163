@@ -67,10 +67,13 @@ public class MiguMusic extends Provider
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 JSONArray candidates = jsonObject.getJSONArray("musics");
-                JSONObject best = selectBestMatch(candidates, keyword);
-                if (best != null)
+                if(candidates != null)
                 {
-                    mId = best.getString("copyrightId");
+                    JSONObject best = selectBestMatch(candidates, keyword);
+                    if (best != null)
+                    {
+                        mId = best.getString("copyrightId");
+                    }
                 }
             }
         } catch (IOException e)

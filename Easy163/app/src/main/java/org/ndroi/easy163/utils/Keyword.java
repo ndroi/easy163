@@ -10,6 +10,25 @@ public class Keyword
 {
     public String songName;
     public List<String> singers = new ArrayList<>();
+    public boolean isOriginalSong = true;
+
+    public void applySongName(String rawSongName)
+    {
+        int p = rawSongName.indexOf('(');
+        if(p == -1)
+        {
+            p = rawSongName.indexOf('（');
+        }
+        if (p != -1)
+        {
+            isOriginalSong = false;
+            songName = rawSongName.substring(0, p);
+        }else
+        {
+            isOriginalSong = true;
+            songName = rawSongName;
+        }
+    }
 
     @Override
     public String toString()

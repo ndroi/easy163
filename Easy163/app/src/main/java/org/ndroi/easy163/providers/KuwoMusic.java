@@ -32,8 +32,8 @@ public class KuwoMusic extends Provider
     private boolean IsNonOriginal(String songName)
     {
         int p1 = songName.indexOf('(');
-        int p2 = songName.indexOf(')');
-        return p1 != -1 && p2 != -1 && p1 < p2;
+        int p2 = songName.indexOf('（');
+        return p1 != -1 || p2 != -1;
     }
 
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
@@ -43,7 +43,7 @@ public class KuwoMusic extends Provider
             JSONObject info = (JSONObject) infoObj;
             Keyword candidateKeyword = new Keyword();
             candidateKeyword.songName = info.getString("name");
-            if (IsNonOriginal(candidateKeyword.songName))
+            if (keyword.isOriginalSong && IsNonOriginal(candidateKeyword.songName))
             {
                 Log.d("KuwoMusic", "Skip Non-Original Version");
                 continue;

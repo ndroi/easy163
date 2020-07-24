@@ -81,7 +81,7 @@ public class PlaylistHook extends BaseHook
                 {
                     String songId = object.getString("id");
                     Keyword keyword = new Keyword();
-                    keyword.songName = object.getString("name");
+                    keyword.applySongName(object.getString("name"));
                     for (Object singerObj : object.getJSONArray("ar"))
                     {
                         JSONObject singer = (JSONObject) singerObj;
