@@ -2,7 +2,6 @@ package org.ndroi.easy163.core;
 
 import org.ndroi.easy163.hooks.CollectHook;
 import org.ndroi.easy163.hooks.DownloadHook;
-import org.ndroi.easy163.hooks.MiguFileHook;
 import org.ndroi.easy163.hooks.PlaylistHook;
 import org.ndroi.easy163.hooks.SongPlayHook;
 import org.ndroi.easy163.vpn.block.BlockHttp;
@@ -24,7 +23,6 @@ public class Server
         HookHttp.getInstance().addHook(new SongPlayHook());
         HookHttp.getInstance().addHook(new CollectHook());
         HookHttp.getInstance().addHook(new DownloadHook());
-        HookHttp.getInstance().addHook(new MiguFileHook());
     }
 
     private void setHttpsBlock()
