@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.providers.utils.KeywordMatch;
@@ -26,13 +28,26 @@ public class MiguMusic extends Provider
         return song;
     }
 
+    private boolean IsNonOriginal(String songName)
+    {
+        int p1 = songName.indexOf('(');
+        int p2 = songName.indexOf('（');
+        return p1 != -1 || p2 != -1;
+    }
+
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
     {
         for (Object infoObj : candidates)
         {
             JSONObject info = (JSONObject) infoObj;
+            String songName = info.getString("songName");
+            if (keyword.isOriginalSong && IsNonOriginal(songName))
+            {
+                Log.d("MiguMusic", "Skip NonOriginal Version");
+                continue;
+            }
             Keyword candidateKeyword = new Keyword();
-            candidateKeyword.songName = info.getString("songName");
+            candidateKeyword.songName = songName;
             candidateKeyword.singers.add(info.getString("singerName"));
             if (KeywordMatch.match(keyword, candidateKeyword))
             {

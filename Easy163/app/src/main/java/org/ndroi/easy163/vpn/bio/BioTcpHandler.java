@@ -210,8 +210,7 @@ public class BioTcpHandler implements Runnable
                 {
                     buffer = HookHttp.getInstance().checkAndHookRequest(tunnel, buffer);
                 }
-                int payloadSize = buffer.remaining();
-                int write = tunnel.destSocket.write(buffer);
+                tunnel.destSocket.write(buffer);
             }
         }
 

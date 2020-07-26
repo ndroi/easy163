@@ -41,13 +41,14 @@ public class KuwoMusic extends Provider
         for (Object infoObj : candidates)
         {
             JSONObject info = (JSONObject) infoObj;
-            Keyword candidateKeyword = new Keyword();
-            candidateKeyword.songName = info.getString("name");
-            if (keyword.isOriginalSong && IsNonOriginal(candidateKeyword.songName))
+            String songName = info.getString("name");
+            if (keyword.isOriginalSong && IsNonOriginal(songName))
             {
                 Log.d("KuwoMusic", "Skip Non-Original Version");
                 continue;
             }
+            Keyword candidateKeyword = new Keyword();
+            candidateKeyword.songName = songName;
             candidateKeyword.singers.add(info.getString("artist"));
             if (KeywordMatch.match(keyword, candidateKeyword))
             {

@@ -30,6 +30,13 @@ public class QQMusic extends Provider
         return song;
     }
 
+    private boolean IsNonOriginal(String songName)
+    {
+        int p1 = songName.indexOf('(');
+        int p2 = songName.indexOf('（');
+        return p1 != -1 || p2 != -1;
+    }
+
     private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
     {
         for (Object infoObj : candidates)
@@ -40,14 +47,14 @@ public class QQMusic extends Provider
             {
                 continue;
             }
-            String title = info.getString("title");
-            if (title.toLowerCase().endsWith("(live)"))
+            String songName = info.getString("title");
+            if (keyword.isOriginalSong && IsNonOriginal(songName))
             {
-                Log.d("QQMusic", "Skip Live Version");
+                Log.d("QQMusic", "Skip NonOriginal Version");
                 continue;
             }
             Keyword candidateKeyword = new Keyword();
-            candidateKeyword.songName = info.getString("name");
+            candidateKeyword.songName = songName;
             JSONArray singersObj = info.getJSONArray("singer");
             for (Object singerObj : singersObj)
             {
