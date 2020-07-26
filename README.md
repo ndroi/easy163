@@ -30,4 +30,4 @@
 欢迎点赞项目，提交问题，你们的支持是我更新改进软件的动力
 
 支付宝捐赠：
-<img src="https://s1.ax1x.com/2020/07/26/a9r2QS.jpg" alt="donate.jpg" border="0" />
+<img src="https://s1.ax1x.com/2020/07/26/a9sHAA.jpg" width="200" height="202" alt="donate.jpg"/>
