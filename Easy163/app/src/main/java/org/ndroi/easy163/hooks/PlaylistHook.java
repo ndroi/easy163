@@ -1,5 +1,7 @@
 package org.ndroi.easy163.hooks;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
 
 import org.ndroi.easy163.core.Cache;
@@ -39,7 +41,6 @@ public class PlaylistHook extends BaseHook
     {
         String method = request.getMethod();
         String host = request.getHeaderFields().get("Host");
-        //Log.d("check rule", host + request.getUri());
         if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
@@ -81,7 +82,7 @@ public class PlaylistHook extends BaseHook
                 {
                     String songId = object.getString("id");
                     Keyword keyword = new Keyword();
-                    keyword.applySongName(object.getString("name"));
+                    keyword.applyRawSongName(object.getString("name"));
                     for (Object singerObj : object.getJSONArray("ar"))
                     {
                         JSONObject singer = (JSONObject) singerObj;
@@ -100,12 +101,15 @@ public class PlaylistHook extends BaseHook
             @Override
             public void apply(JSONObject object)
             {
+                if(object.containsKey("fee"))
+                {
+                    object.put("fee", 0);
+                }
                 if (object.containsKey("st") &&
                         object.containsKey("subp") &&
                         object.containsKey("pl") &&
                         object.containsKey("dl"))
                 {
-                    object.put("fee", 0);
                     object.put("st", 0);
                     object.put("subp", 1);
                     if (object.getIntValue("pl") == 0)

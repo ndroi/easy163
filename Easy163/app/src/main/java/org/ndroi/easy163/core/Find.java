@@ -1,5 +1,7 @@
 package org.ndroi.easy163.core;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
@@ -28,7 +30,7 @@ public class Find
                 JSONObject songObj = jsonObject.getJSONArray("songs")
                         .getJSONObject(0);
                 keyword = new Keyword();
-                keyword.applySongName(songObj.getString("name"));
+                keyword.applyRawSongName(songObj.getString("name"));
                 for (Object singerObj : songObj.getJSONArray("artists"))
                 {
                     JSONObject singer = (JSONObject) singerObj;

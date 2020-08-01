@@ -1,7 +1,6 @@
 package org.ndroi.easy163.core;
 
 import android.util.Log;
-
 import org.ndroi.easy163.providers.KuwoMusic;
 import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
@@ -9,24 +8,20 @@ import org.ndroi.easy163.providers.QQMusic;
 import org.ndroi.easy163.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /* search Song from providers */
 public class Search
 {
-    private static List<Provider> providers = Arrays.asList(
-            new KuwoMusic(),
-            new MiguMusic(),
-            new QQMusic()
-    );
-
-    public static Song search(Keyword keyword)
+    public static Song search(Keyword targetKeyword)
     {
-        Log.d("search", "start to search: " + keyword.toString());
-        List<Song> songs = new ArrayList<>();
+        List<Provider> providers = Arrays.asList(
+                new KuwoMusic(targetKeyword),
+                new MiguMusic(targetKeyword),
+                new QQMusic(targetKeyword)
+        );
+        Log.d("search", "start to search: " + targetKeyword.toString());
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         for (Provider provider : providers)
         {
@@ -35,30 +30,22 @@ public class Search
                 public void run()
                 {
                     super.run();
-                    Song song = provider.match(keyword);
-                    if (song != null)
-                    {
-                        synchronized (songs)
-                        {
-                            songs.add(song);
-                        }
-                    }
+                    provider.collectCandidateKeywords();
                 }
             });
         }
         long startTime = System.currentTimeMillis();
-        /* just busy wait util first search successfully or all threads finish or 10 seconds */
-        while (songs.isEmpty())
+        while (true)
         {
             if(concurrencyTask.isAllFinished())
             {
-                Log.d("search", "all providers finish");
+                Log.d("search", "all providers finish collect");
                 break;
             }
             long endTime = System.currentTimeMillis();
-            if (endTime - startTime > 10 * 1000)
+            if (endTime - startTime > 8 * 1000)
             {
-                Log.d("search", "timeout");
+                Log.d("search", "collect candidateKeywords timeout");
                 break;
             }
             try
@@ -69,10 +56,19 @@ public class Search
                 e.printStackTrace();
             }
         }
-        if (!songs.isEmpty())
+        Provider bestProvider = Provider.selectCandidateKeywords(providers);
+        if (bestProvider != null)
         {
-            Log.d("search", "from provider:\n" + songs.get(0).toString());
-            return songs.get(0);
+            Log.d("search", "bestProvider " + bestProvider.toString());
+            Song song = bestProvider.fetchSelectedSong();
+            if(song != null)
+            {
+                Log.d("search", "from provider:\n" + song.toString());
+            }else
+            {
+                Log.d("search", "fetchSelectedSong failed");
+            }
+            return song;
         }
         return null;
     }

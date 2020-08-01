@@ -111,10 +111,14 @@ public class DownloadHook extends BaseHook
         {
             String id = songObject.getString("id");
             Song providerSong = (Song) Cache.providerSongs.get(id);
+            if(providerSong == null)
+            {
+                Log.d("DownloadHook", "no provider found");
+                return;
+            }
             if (providerSong.md5.equals("unknown"))
             {
                 providerSong.md5 = preDownloadForMd5(providerSong.url);
-                //Log.d("DownloadHook", "Pre-download for md5: " + providerSong.md5);
             }
             songObject.put("code", 200);
             songObject.put("url", providerSong.url);

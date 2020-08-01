@@ -10,9 +10,9 @@ public class Keyword
 {
     public String songName;
     public List<String> singers = new ArrayList<>();
-    public boolean isOriginalSong = true;
+    public String extra = null; // extra songName info in (xxx)
 
-    public void applySongName(String rawSongName)
+    public void applyRawSongName(String rawSongName)
     {
         int p = rawSongName.indexOf('(');
         if(p == -1)
@@ -21,23 +21,32 @@ public class Keyword
         }
         if (p != -1)
         {
-            isOriginalSong = false;
-            songName = rawSongName.substring(0, p);
+            songName = rawSongName.substring(0, p).trim();
+            int q = rawSongName.indexOf(')', p);
+            if(q == -1)
+            {
+                q = rawSongName.indexOf('）', p);
+            }
+            if(q != -1)
+            {
+                extra = rawSongName.substring(p + 1, q);
+            }
         }else
         {
-            isOriginalSong = true;
-            songName = rawSongName;
+            songName = rawSongName.trim();
+            extra = null;
         }
     }
 
     @Override
     public String toString()
     {
-        String str = songName + ": ";
+        String str = songName + ":";
         for (String singer : singers)
         {
-            str += '/' + singer;
+            str += singer + '/';
         }
+        str = str.substring(0, str.length() - 1);
         return str;
     }
 }

@@ -7,8 +7,14 @@ import org.ndroi.easy163.utils.Keyword;
  */
 public class KeywordMatch
 {
-    private static boolean match(String a, String b)
+    public static boolean match(String a, String b)
     {
+        if(a == null || b == null || a.isEmpty() || b.isEmpty())
+        {
+            return false;
+        }
+        a = a.toLowerCase();
+        b = b.toLowerCase();
         return a.contains(b) || b.contains(a);
     }
 

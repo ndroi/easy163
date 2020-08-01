@@ -47,7 +47,7 @@ public class SongPlayHook extends BaseHook
                         Song providerSong = (Song) Cache.providerSongs.get(id);
                         if (providerSong == null)
                         {
-                            Log.d("easy163", "no provider found");
+                            Log.d("SongPlayHook", "no provider found");
                             return;
                         }
                         songObject.put("fee", 0);

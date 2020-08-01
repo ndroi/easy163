@@ -1,83 +1,31 @@
 package org.ndroi.easy163.providers;
 
-import android.util.Log;
-import android.util.Pair;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-
-import org.ndroi.easy163.providers.utils.KeywordMatch;
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class QQMusic extends Provider
 {
+    public QQMusic(Keyword targetKeyword)
+    {
+        super(targetKeyword);
+    }
+
     @Override
-    public Song match(Keyword keyword)
+    public void collectCandidateKeywords()
     {
-        String query = keyword2Query(keyword);
-        Pair<String, String> mIdAndMediaId = getMIdAndMediaId(query, keyword);
-        if (mIdAndMediaId == null)
-        {
-            return null;
-        }
-        Song song = getSong(mIdAndMediaId);
-        return song;
-    }
-
-    private boolean IsNonOriginal(String songName)
-    {
-        int p1 = songName.indexOf('(');
-        int p2 = songName.indexOf('（');
-        return p1 != -1 || p2 != -1;
-    }
-
-    private JSONObject selectBestMatch(JSONArray candidates, Keyword keyword)
-    {
-        for (Object infoObj : candidates)
-        {
-            JSONObject info = (JSONObject) infoObj;
-            int pay = info.getJSONObject("pay").getIntValue("pay_play");
-            if (pay != 0)
-            {
-                continue;
-            }
-            String songName = info.getString("title");
-            if (keyword.isOriginalSong && IsNonOriginal(songName))
-            {
-                Log.d("QQMusic", "Skip NonOriginal Version");
-                continue;
-            }
-            Keyword candidateKeyword = new Keyword();
-            candidateKeyword.songName = songName;
-            JSONArray singersObj = info.getJSONArray("singer");
-            for (Object singerObj : singersObj)
-            {
-                String singer = ((JSONObject) singerObj).getString("name");
-                candidateKeyword.singers.add(singer);
-            }
-            if (KeywordMatch.match(keyword, candidateKeyword))
-            {
-                return info;
-            }
-        }
-        return null;
-    }
-
-    private Pair<String, String> getMIdAndMediaId(String query, Keyword keyword)
-    {
+        String query = keyword2Query(targetKeyword);
         String url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?" +
                 "ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.center&" +
                 "searchid=46804741196796149&t=0&aggr=1&cr=1&catZhida=1&lossless=0&" +
                 "flag_qc=0&p=1&n=20&w=" + query + "&" +
                 "g_tk=5381&jsonpCallback=MusicJsonCallback10005317669353331&loginUin=0&hostUin=0&" +
                 "format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0";
-        Pair<String, String> mIdAndMediaId = null;
         try
         {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -97,12 +45,30 @@ public class QQMusic extends Provider
                     JSONArray candidates = jsonObject.getJSONObject("data")
                             .getJSONObject("song")
                             .getJSONArray("list");
-                    JSONObject best = selectBestMatch(candidates, keyword);
-                    if (best != null)
+                    for (Object infoObj : candidates)
                     {
-                        String mId = best.getString("mid");
-                        String mediaId = best.getJSONObject("file").getString("media_mid");
-                        mIdAndMediaId = new Pair<>(mId, mediaId);
+                        JSONObject songJsonObject = (JSONObject) infoObj;
+                        int pay = songJsonObject.getJSONObject("pay").getIntValue("pay_play");
+                        if (pay != 0)
+                        {
+                            continue;
+                        }
+                        JSONObject files = songJsonObject.getJSONObject("file");
+                        if(files.getIntValue("size_128") == 0 && files.getIntValue("size_320") == 0)
+                        {
+                            continue;
+                        }
+                        String songName = songJsonObject.getString("title");
+                        Keyword candidateKeyword = new Keyword();
+                        candidateKeyword.songName = songName;
+                        JSONArray singersObj = songJsonObject.getJSONArray("singer");
+                        for (Object singerObj : singersObj)
+                        {
+                            String singer = ((JSONObject) singerObj).getString("name");
+                            candidateKeyword.singers.add(singer);
+                        }
+                        songJsonObjects.add(songJsonObject);
+                        candidateKeywords.add(candidateKeyword);
                     }
                 }
             }
@@ -110,13 +76,18 @@ public class QQMusic extends Provider
         {
             e.printStackTrace();
         }
-        return mIdAndMediaId;
     }
 
-    private Song getSong(Pair<String, String> best)
+    @Override
+    public Song fetchSelectedSong()
     {
-        String mId = best.first;
-        String mediaId = best.second;
+        if(selectedIndex == -1)
+        {
+            return null;
+        }
+        JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
+        String mId = songJsonObject.getString("mid");
+        String mediaId = songJsonObject.getJSONObject("file").getString("media_mid");
         String filename = "M500" + mediaId + ".mp3";
         String url = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=" +
                 "{\"req_0\":{\"module\":\"vkey.GetVkeyServer\"," +

@@ -1,6 +1,10 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
+import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.providers.utils.BitRate;
+import org.ndroi.easy163.providers.utils.KeywordMatch;
 import org.ndroi.easy163.providers.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
@@ -9,9 +13,28 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class Provider
 {
+    protected Keyword targetKeyword;
+    protected int selectedIndex = -1;
+    protected List<Keyword> candidateKeywords = new ArrayList<>();
+    protected List<JSONObject> songJsonObjects = new ArrayList<>();
+
+    public Provider(Keyword targetKeyword)
+    {
+        this.targetKeyword = targetKeyword;
+    }
+
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName();
+    }
+
     static protected String keyword2Query(Keyword keyword)
     {
         String str = keyword.songName;
@@ -27,6 +50,77 @@ public abstract class Provider
             e.printStackTrace();
         }
         return str;
+    }
+
+    static private int calculateScore(Keyword candidateKeyword, Keyword targetKeyword, int index)
+    {
+        if(!KeywordMatch.match(candidateKeyword, targetKeyword))
+        {
+            return -100;
+        }
+        int score = 5 - 3*index;
+        String targetName = targetKeyword.songName.toLowerCase();
+        String candidateSongName = candidateKeyword.songName.toLowerCase();
+        int candidateLen = candidateSongName.length();
+        int targetLen = targetName.length();
+        score -= Math.abs(candidateLen - targetLen);
+        String leftName = candidateSongName.replace(targetName, " ");
+        List<String> words = Arrays.asList(
+                "live", "dj", "remix", "cover", "instrumental", "伴奏", "翻唱", "翻自"
+        );
+        for (String word : words)
+        {
+            if(KeywordMatch.match(word, leftName))
+            {
+                if(KeywordMatch.match(word, targetKeyword.extra))
+                {
+                    score = 5;
+                }else
+                {
+                    score -= 2;
+                }
+            }
+        }
+        score -= Math.abs(targetKeyword.singers.size() - candidateKeyword.singers.size());
+        for (String targetSinger : targetKeyword.singers)
+        {
+            for (String candidateSinger : candidateKeyword.singers)
+            {
+                if (KeywordMatch.match(targetSinger, candidateSinger))
+                {
+                    score += 2;
+                    score -= 2*Math.abs(targetSinger.length() - candidateSinger.length());
+                }
+            }
+        }
+        Log.d("calculateScore", candidateKeyword.toString() + '|' + targetKeyword.toString() + "|" + score);
+        return score;
+    }
+
+    static public Provider selectCandidateKeywords(List<Provider> providers)
+    {
+        Provider bestProvider = null;
+        int maxScore = -100;
+        int selectIndex = -1;
+        for (Provider provider : providers)
+        {
+            for (int i = 0; i < provider.candidateKeywords.size(); i++)
+            {
+                Keyword candidateKeyword = provider.candidateKeywords.get(i);
+                int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
+                if(score > maxScore)
+                {
+                    maxScore = score;
+                    selectIndex = i;
+                    bestProvider = provider;
+                }
+            }
+        }
+        if(bestProvider != null)
+        {
+            bestProvider.selectedIndex = selectIndex;
+        }
+        return bestProvider;
     }
 
     static protected Song generateSong(String url)
@@ -68,5 +162,6 @@ public abstract class Provider
         return song;
     }
 
-    abstract public Song match(Keyword keyword);
+    abstract public void collectCandidateKeywords();
+    abstract public Song fetchSelectedSong();
 }
