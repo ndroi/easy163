@@ -27,4 +27,4 @@
 
 感谢 [https://github.com/mightofcode/android-vpnservice] 实现了轻量易用的 Android VPN 代理程序
 
-欢迎点赞项目，提交问题。
+欢迎点赞项目，提交问题
