@@ -33,7 +33,8 @@ public class PlaylistHook extends BaseHook
             "/eapi/song/enhance/privilege",
             "/eapi/song/enhance/info/get",
             "/search/song/get",
-            "/search/complex/get/"
+            "/search/complex/get/",
+            "/eapi/v1/artist/songs"
     );
 
     @Override
