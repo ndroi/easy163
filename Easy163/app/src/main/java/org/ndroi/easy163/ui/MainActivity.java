@@ -155,14 +155,6 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
         else
             onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
-        CheckBox checkBox=findViewById(R.id.ck_startmusic);
-        if (checkBox.isChecked()){
-            Intent intent = getPackageManager().getLaunchIntentForPackage("com.netease.cloudmusic");
-            if (intent != null) {
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-            }
-        }
     }
 
     private void stopVPN()
@@ -181,6 +173,13 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, LocalVPNService.class);
             startService(intent);
             Toast.makeText(this, "开启 VPN 服务成功", Toast.LENGTH_SHORT).show();
+            if (checkBox.isChecked()){
+                intent2 intent2 = getPackageManager().getLaunchintent2ForPackage("com.netease.cloudmusic");
+                if (intent2 != null) {
+                    intent2.setFlags(intent2.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent2);
+                }
+            }
         }
     }
 }
