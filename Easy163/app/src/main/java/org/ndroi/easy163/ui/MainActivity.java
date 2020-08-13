@@ -46,6 +46,17 @@ public class MainActivity extends AppCompatActivity
         ToggleButton toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
         Server.getInstance().start();
+        CheckBox checkBox=findViewById(R.id.ck_startmusic);
+        SharedPreferences sharedPreferences=getSharedPreferences("ck_startmusic", Context.MODE_PRIVATE);
+        checkBox.setChecked(sharedPreferences.getBoolean("isChecked",true));
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("isChecked",isChecked);
+                editor.commit();
+            }
+        });
     }
 
     @Override
@@ -141,6 +152,14 @@ public class MainActivity extends AppCompatActivity
             startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
         else
             onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+        CheckBox checkBox=findViewById(R.id.ck_startmusic);
+        if (checkBox.isChecked()){
+            Intent intent = getPackageManager().getLaunchIntentForPackage("com.netease.cloudmusic");
+            if (intent != null) {
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        }
     }
 
     private void stopVPN()
