@@ -1,7 +1,9 @@
 package org.ndroi.easy163.ui;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
@@ -14,7 +16,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 import org.ndroi.easy163.R;
@@ -46,6 +51,45 @@ public class MainActivity extends AppCompatActivity
         ToggleButton toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
         Server.getInstance().start();
+        //添加同时启动网易云音乐复选框
+        CheckBox ck_startmusic=findViewById(R.id.ck_startmusic);
+        //添加普通版单选按钮
+        RadioButton rb_common=findViewById(R.id.rb_common);
+        //添加极速版单选按钮
+        RadioButton rb_lite=findViewById(R.id.rb_lite);
+        //添加网易云音乐版本按钮组
+        RadioGroup rg_version=findViewById(R.id.rg_version);
+        //从配置文件读取上次的按钮状态
+        SharedPreferences sharedPreferences=getSharedPreferences("easy_configs", Context.MODE_PRIVATE);
+        if (sharedPreferences.getBoolean("isCommon",true)){
+            rb_common.setChecked(true);
+        }else {
+            rb_lite.setChecked(true);
+        }
+        ck_startmusic.setChecked(sharedPreferences.getBoolean("isChecked",true));
+        //添加按钮组改变事件，保存按钮状态到配置文件
+        rg_version.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int id) {
+                boolean isCommon;
+                if (R.id.rb_common==id){
+                    isCommon=true;
+                }else {
+                    isCommon=false;
+                }
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("isCommon",isCommon);
+                editor.commit();
+            }
+        });
+        ck_startmusic.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("isChecked",isChecked);
+                editor.commit();
+            }
+        });
     }
 
     @Override
@@ -133,7 +177,6 @@ public class MainActivity extends AppCompatActivity
             stopVPN();
         }
     }
-
     private void startVPN()
     {
         Intent vpnIntent = VpnService.prepare(this);
@@ -159,6 +202,25 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, LocalVPNService.class);
             startService(intent);
             Toast.makeText(this, "开启 VPN 服务成功", Toast.LENGTH_SHORT).show();
+            CheckBox ck_startmusic=findViewById(R.id.ck_startmusic);
+            RadioButton rb_common=findViewById(R.id.rb_common);
+            //如果同时启动网易云音乐
+            if (ck_startmusic.isChecked()){
+                //保存包名
+                String pkgNmae;
+                //如果普通版选中
+                if (rb_common.isChecked()){
+                    pkgNmae="com.netease.cloudmusic";
+                }else {
+                    pkgNmae="com.netease.cloudmusic.lite";
+                }
+                //启动网易云音乐
+                Intent intent2 = getPackageManager().getLaunchIntentForPackage(pkgNmae);
+                if (intent2 != null) {
+                    intent2.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent2);
+                }
+            }
         }
     }
 }
