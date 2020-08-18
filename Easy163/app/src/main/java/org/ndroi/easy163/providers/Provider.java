@@ -1,7 +1,6 @@
 package org.ndroi.easy163.providers;
 
 import android.util.Log;
-
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.providers.utils.BitRate;
 import org.ndroi.easy163.providers.utils.KeywordMatch;
@@ -74,7 +73,7 @@ public abstract class Provider
             {
                 if(KeywordMatch.match(word, targetKeyword.extra))
                 {
-                    score = 5;
+                    score = 7;
                 }else
                 {
                     score -= 2;

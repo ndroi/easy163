@@ -6,6 +6,7 @@ import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
 import org.ndroi.easy163.providers.QQMusic;
 import org.ndroi.easy163.utils.ConcurrencyTask;
+import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 import java.util.Arrays;
@@ -22,6 +23,7 @@ public class Search
                 new QQMusic(targetKeyword)
         );
         Log.d("search", "start to search: " + targetKeyword.toString());
+        EasyLog.log("开始全网搜索：" + targetKeyword.toString());
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         for (Provider provider : providers)
         {
@@ -64,12 +66,15 @@ public class Search
             if(song != null)
             {
                 Log.d("search", "from provider:\n" + song.toString());
+                EasyLog.log("搜索到播放链接：" + song.url);
             }else
             {
                 Log.d("search", "fetchSelectedSong failed");
+                EasyLog.log("未搜索到资源：" + targetKeyword.toString());
             }
             return song;
         }
+        EasyLog.log("未搜索到资源：" + targetKeyword.toString());
         return null;
     }
 }

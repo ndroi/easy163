@@ -41,7 +41,7 @@ public class Keyword
     @Override
     public String toString()
     {
-        String str = songName + ":";
+        String str = songName + "-";
         for (String singer : singers)
         {
             str += singer + '/';

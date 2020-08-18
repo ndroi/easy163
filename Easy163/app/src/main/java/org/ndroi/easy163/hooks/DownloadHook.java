@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.utils.Crypto;
@@ -141,7 +142,7 @@ public class DownloadHook extends BaseHook
         byte[] bytes = Crypto.aesDecrypt(response.getContent());
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleDownload(jsonObject);
-        bytes = jsonObject.toString().getBytes();
+        bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
         bytes = Crypto.aesEncrypt(bytes);
         response.setContent(bytes);
     }

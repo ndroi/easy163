@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.VpnService;
@@ -17,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.ndroi.easy163.R;
+import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.bio.BioTcpHandler;
 import org.ndroi.easy163.vpn.bio.BioUdpHandler;
 import org.ndroi.easy163.vpn.config.Config;
@@ -77,7 +79,8 @@ public class LocalVPNService extends VpnService
         executorService.submit(new BioTcpHandler(deviceToNetworkTCPQueue, networkToDeviceQueue, this));
         executorService.submit(new VPNRunnable(vpnInterface.getFileDescriptor(),
                 deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
-        Log.i(TAG, "Started");
+        Log.i(TAG, "Easy163 VPN 开始运行");
+        EasyLog.log("Easy163 VPN 开始运行");
     }
 
     private void startNotification()
@@ -115,13 +118,27 @@ public class LocalVPNService extends VpnService
                 builder.addRoute(VPN_ROUTE, 0);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 {
-                    builder.addAllowedApplication("com.netease.cloudmusic");
+                    try
+                    {
+                        builder.addAllowedApplication("com.netease.cloudmusic");
+                    }catch (PackageManager.NameNotFoundException e)
+                    {
+                        Log.d(TAG, "未检测到网易云音乐");
+                    }
+                    try
+                    {
+                        builder.addAllowedApplication("com.netease.cloudmusic.lite");
+                    }catch (PackageManager.NameNotFoundException e)
+                    {
+                        Log.d(TAG, "未检测到网易云音乐极速版");
+                    }
                 }
                 vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
             }
         } catch (Exception e)
         {
-            Log.e(TAG, "error", e);
+            Log.e(TAG, "Easy163 VPN 启动失败");
+            EasyLog.log("Easy163 VPN 启动失败");
             System.exit(0);
         }
     }
@@ -138,6 +155,7 @@ public class LocalVPNService extends VpnService
         super.onDestroy();
         executorService.shutdownNow();
         cleanup();
+        EasyLog.log("Easy163 VPN 停止运行");
         Log.i(TAG, "Stopped");
     }
 

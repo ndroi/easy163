@@ -11,55 +11,29 @@
 
 <LinearLayout
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintLeft_toLeftOf="parent"
-    app:layout_constraintRight_toRightOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    android:gravity="center_horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-        <RadioGroup
-            android:id="@+id/rg_version"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <RadioButton
-                android:id="@+id/rb_common"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:checked="true"
-                android:text="普通版" />
-
-            <RadioButton
-                android:id="@+id/rb_lite"
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="极速版" />
-        </RadioGroup>
-
-
-    <CheckBox
-        android:id="@+id/ck_startmusic"
-        android:text="同时启动网易云音乐"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="30dp"
+        android:paddingLeft="30dp"
+        android:gravity="bottom"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:autoLink="web"
+        android:id="@+id/log"/>
 
     <ToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         style="@android:style/Widget.Material.Light.Button.Toggle"
         android:textOn="服务开启中，点击关闭"
         android:textOff="服务关闭中，点击开启"
         android:id="@+id/bt_start"/>
-
 </LinearLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

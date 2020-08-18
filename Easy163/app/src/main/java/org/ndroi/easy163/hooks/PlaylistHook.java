@@ -3,6 +3,7 @@ package org.ndroi.easy163.hooks;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.hooks.utils.JsonUtil;
@@ -11,6 +12,7 @@ import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.vpn.hookhttp.Request;
 import org.ndroi.easy163.vpn.hookhttp.Response;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,6 +44,7 @@ public class PlaylistHook extends BaseHook
     {
         String method = request.getMethod();
         String host = request.getHeaderFields().get("Host");
+        Log.d("check rule", host + "" + getPath(request));
         if (!method.equals("POST") || !host.endsWith("music.163.com"))
         {
             return false;
@@ -65,7 +68,7 @@ public class PlaylistHook extends BaseHook
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         cacheKeywords(jsonObject);
         modifyPrivileges(jsonObject);
-        bytes = jsonObject.toString().getBytes();
+        bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
         bytes = Crypto.aesEncrypt(bytes);
         response.setContent(bytes);
     }

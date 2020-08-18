@@ -1,6 +1,7 @@
 package org.ndroi.easy163.hooks;
 
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import org.ndroi.easy163.utils.Crypto;
 import org.ndroi.easy163.vpn.hookhttp.Request;
@@ -35,7 +36,7 @@ public class CollectHook extends BaseHook
             jsonObject.put("count", 999);
             jsonObject.put("cloudCount", 0);
         }
-        bytes = jsonObject.toString().getBytes();
+        bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
         bytes = Crypto.aesEncrypt(bytes);
         response.setContent(bytes);
     }
