@@ -19,6 +19,8 @@ import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
+
+import org.ndroi.easy163.BuildConfig;
 import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Server;
 import org.ndroi.easy163.utils.EasyLog;
@@ -81,8 +83,7 @@ public class MainActivity extends AppCompatActivity
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
                     "如无法使用请重启音乐软件\n" +
-                    "如遇到设备网络异常请关闭本软件\n" +
-                    "版本更新请关注 Github Release");
+                    "如遇到设备网络异常请关闭本软件");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -111,6 +112,20 @@ public class MainActivity extends AppCompatActivity
             Builder builder = new Builder(this);
             builder.setTitle("捐赠支持");
             builder.setMessage("暂未开放捐赠\n欢迎 Github 点赞支持");
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
+        } else if (id == R.id.nav_about)
+        {
+            Builder builder = new Builder(this);
+            builder.setTitle("关于");
+            builder.setMessage("当前版本 " + BuildConfig.VERSION_NAME + "\n版本更新请关注 Github Release");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -162,7 +177,6 @@ public class MainActivity extends AppCompatActivity
             waitingForVPNStart = true;
             Intent intent = new Intent(this, LocalVPNService.class);
             startService(intent);
-            Toast.makeText(this, "开启 VPN 服务成功", Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -90,7 +90,7 @@ public class MiguMusic extends Provider
                 if (code.equals("000000"))
                 {
                     String songUrl = jsonObject.getJSONObject("data").getString("playUrl");
-                    if(songUrl == null)
+                    if(songUrl == null || songUrl.isEmpty())
                     {
                         return;
                     }

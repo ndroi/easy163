@@ -20,10 +20,12 @@
         android:layout_height="500dp"
         android:paddingTop="20dp"
         android:paddingBottom="30dp"
-        android:paddingLeft="30dp"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:fadeScrollbars="false"
+        android:longClickable="false"
         android:autoLink="web"
         android:id="@+id/log"/>
 
