@@ -1,22 +1,18 @@
 package org.ndroi.easy163.providers;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.ndroi.easy163.providers.utils.KeywordMatch;
+
 import org.ndroi.easy163.providers.utils.MiguCrypto;
-import org.ndroi.easy163.providers.utils.ReadStream;
+import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MiguMusic extends Provider

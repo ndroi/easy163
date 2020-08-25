@@ -1,5 +1,6 @@
 package org.ndroi.easy163.ui;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -14,23 +15,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
-import android.widget.Toast;
 import android.widget.ToggleButton;
-
 import org.ndroi.easy163.BuildConfig;
 import org.ndroi.easy163.R;
+import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.core.Server;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.LocalVPNService;
-
 import static android.support.v7.app.AlertDialog.Builder;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ToggleButton.OnCheckedChangeListener
 {
+    private static Context context = null;
+
+    public static Context getContext()
+    {
+        return context;
+    }
+
     private static final int VPN_REQUEST_CODE = 0x0F;
     private boolean waitingForVPNStart;
 
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        context = getApplicationContext();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -52,6 +57,7 @@ public class MainActivity extends AppCompatActivity
         toggleButton.setOnCheckedChangeListener(this);
         EasyLog.setTextView(findViewById(R.id.log));
         Server.getInstance().start();
+        Cache.Init();
     }
 
     @Override

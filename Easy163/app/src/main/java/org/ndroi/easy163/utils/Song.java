@@ -9,9 +9,9 @@ package org.ndroi.easy163.utils;
  * */
 public class Song
 {
+    public String url = "unknown";
     public int size = 10 * 1000 * 1000;
     public int br = 192000;
-    public String url = "unknown";
     public String md5 = "unknown";
 
     @Override
