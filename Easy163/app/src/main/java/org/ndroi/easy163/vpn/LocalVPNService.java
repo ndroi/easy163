@@ -16,15 +16,16 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-
 import org.ndroi.easy163.R;
+import org.ndroi.easy163.core.Cache;
+import org.ndroi.easy163.core.Server;
+import org.ndroi.easy163.ui.MainActivity;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.bio.BioTcpHandler;
 import org.ndroi.easy163.vpn.bio.BioUdpHandler;
 import org.ndroi.easy163.vpn.config.Config;
 import org.ndroi.easy163.vpn.tcpip.Packet;
 import org.ndroi.easy163.vpn.util.ByteBufferPool;
-
 import java.io.Closeable;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -43,23 +44,26 @@ public class LocalVPNService extends VpnService
     private static final String VPN_ADDRESS = "10.0.0.2"; // Only IPv4 support for now
     private static final String VPN_ROUTE = "0.0.0.0"; // Intercept everything
     private ParcelFileDescriptor vpnInterface = null;
-    private PendingIntent pendingIntent;
     private BlockingQueue<Packet> deviceToNetworkUDPQueue;
     private BlockingQueue<Packet> deviceToNetworkTCPQueue;
     private BlockingQueue<ByteBuffer> networkToDeviceQueue;
     private ExecutorService executorService;
+    private Boolean isRunning = false;
+    private static Context context = null;
+
+    public static Context getContext()
+    {
+        return context;
+    }
 
     private BroadcastReceiver stopReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            if ("stop".equals(intent.getAction()))
-            {
-                executorService.shutdownNow();
-                cleanup();
-                LocalVPNService.this.stopSelf();
-            }
+            executorService.shutdownNow();
+            cleanup();
+            LocalVPNService.this.stopSelf();
         }
     };
 
@@ -67,10 +71,9 @@ public class LocalVPNService extends VpnService
     public void onCreate()
     {
         super.onCreate();
-        startNotification();
+        context = getApplicationContext();
         setupVPN();
-        LocalBroadcastManager.getInstance(this).
-                registerReceiver(stopReceiver, new IntentFilter("stop"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("stop"));
         deviceToNetworkUDPQueue = new ArrayBlockingQueue<Packet>(1000);
         deviceToNetworkTCPQueue = new ArrayBlockingQueue<Packet>(1000);
         networkToDeviceQueue = new ArrayBlockingQueue<>(1000);
@@ -79,6 +82,10 @@ public class LocalVPNService extends VpnService
         executorService.submit(new BioTcpHandler(deviceToNetworkTCPQueue, networkToDeviceQueue, this));
         executorService.submit(new VPNRunnable(vpnInterface.getFileDescriptor(),
                 deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
+        startNotification();
+        Server.getInstance().start();
+        Cache.Init();
+        isRunning = true;
         Log.i(TAG, "Easy163 VPN 开始运行");
         EasyLog.log("Easy163 VPN 开始运行");
     }
@@ -94,7 +101,11 @@ public class LocalVPNService extends VpnService
             notificationManager.createNotificationChannel(channel);
         }
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.icon);
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, 0);
         Notification.Builder builder = new Notification.Builder(this)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.icon)
                 .setLargeIcon(icon)
                 .setContentTitle("Easy163")
@@ -133,7 +144,7 @@ public class LocalVPNService extends VpnService
                         Log.d(TAG, "未检测到网易云音乐极速版");
                     }
                 }
-                vpnInterface = builder.setSession(getString(R.string.app_name)).setConfigureIntent(pendingIntent).establish();
+                vpnInterface = builder.setSession(getString(R.string.app_name)).establish();
             }
         } catch (Exception e)
         {
@@ -146,6 +157,9 @@ public class LocalVPNService extends VpnService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
+        Intent replyIntent=  new Intent("service");
+        replyIntent.putExtra("isRunning", isRunning);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(replyIntent);
         return START_STICKY;
     }
 
@@ -155,6 +169,7 @@ public class LocalVPNService extends VpnService
         super.onDestroy();
         executorService.shutdownNow();
         cleanup();
+        isRunning = false;
         EasyLog.log("Easy163 VPN 停止运行");
         Log.i(TAG, "Stopped");
     }

@@ -6,6 +6,8 @@ import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Song;
+import org.ndroi.easy163.vpn.LocalVPNService;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -25,6 +27,7 @@ public class Cache
     {
         public abstract void load(Map<String, Object> items);
         public abstract void update(String id, Object value);
+        public abstract void onCacheHit(String id, Object value);
     }
 
     private Map<String, Object> items = new LinkedHashMap<>();
@@ -61,7 +64,12 @@ public class Cache
         {
             if (items.containsKey(id))
             {
-                return items.get(id);
+                Object value = items.get(id);
+                if(diskSaver != null)
+                {
+                    diskSaver.onCacheHit(id, value);
+                }
+                return value;
             }
             if (addAction == null)
             {
@@ -93,21 +101,13 @@ public class Cache
             }
         });
 
-        providerSongs = new Cache(new AddAction()
-        {
-            @Override
-            public Object add(String id)
-            {
-                Keyword keyword = (Keyword) neteaseKeywords.get(id);
-                return Search.search(keyword);
-            }
-        }, new DiskSaver()
+        DiskSaver diskSaver = new DiskSaver()
         {
             private String diskFilename = "easy163_provider_songs";
 
             private File getCacheFile()
             {
-                File cacheDir = MainActivity.getContext().getCacheDir();
+                File cacheDir = LocalVPNService.getContext().getCacheDir();
                 return new File(cacheDir, diskFilename);
             }
 
@@ -168,6 +168,24 @@ public class Cache
                 {
                     e.printStackTrace();
                 }
+            }
+
+            @Override
+            public void onCacheHit(String id, Object value)
+            {
+                Song song = (Song) value;
+                EasyLog.log("本地缓存命中：" + song.url);
+                Log.d("DiskSaver", "本地缓存命中：" + song.url);
+            }
+        };
+
+        providerSongs = new Cache(new AddAction()
+        {
+            @Override
+            public Object add(String id)
+            {
+                Keyword keyword = (Keyword) neteaseKeywords.get(id);
+                return Search.search(keyword);
             }
         });
     }
