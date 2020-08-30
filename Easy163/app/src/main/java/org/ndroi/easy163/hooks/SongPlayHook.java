@@ -30,6 +30,14 @@ public class SongPlayHook extends BaseHook
         return path.contains("/song/enhance/player/url");
     }
 
+    public void hookRequest(Request request)
+    {
+        super.hookRequest(request);
+        Crypto.Request cryptoRequest = Crypto.decryptRequestBody(new String(request.getContent()));
+        Log.d("SongPlayHook", cryptoRequest.path);
+        Log.d("SongPlayHook", cryptoRequest.json.toString());
+    }
+
     private void handleNoFreeSong(JSONObject jsonObject)
     {
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();

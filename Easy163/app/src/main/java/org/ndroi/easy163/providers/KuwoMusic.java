@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.utils.ReadStream;
@@ -8,6 +10,7 @@ import org.ndroi.easy163.utils.Song;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.acl.LastOwnerException;
 import java.util.Arrays;
 
 public class KuwoMusic extends Provider
@@ -38,6 +41,7 @@ public class KuwoMusic extends Provider
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
+                Log.d("KuwoMusic", str);
                 if (jsonObject.getIntValue("code") == 200)
                 {
                     JSONArray candidates = jsonObject.getJSONObject("data").getJSONArray("list");

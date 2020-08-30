@@ -7,7 +7,6 @@ import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Song;
 import org.ndroi.easy163.vpn.LocalVPNService;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -101,84 +100,6 @@ public class Cache
             }
         });
 
-        DiskSaver diskSaver = new DiskSaver()
-        {
-            private String diskFilename = "easy163_provider_songs";
-
-            private File getCacheFile()
-            {
-                File cacheDir = LocalVPNService.getContext().getCacheDir();
-                return new File(cacheDir, diskFilename);
-            }
-
-            @Override
-            public void load(Map<String, Object> items)
-            {
-                String data = "";
-                try
-                {
-                    FileInputStream inputStream = new FileInputStream(getCacheFile());
-                    byte[] bytes = ReadStream.read(inputStream);
-                    data = new String(bytes);
-                    inputStream.close();
-                } catch (FileNotFoundException e)
-                {
-                    //e.printStackTrace();
-                    EasyLog.log("未发现本地缓存");
-                    Log.d("DiskSaver", "未发现本地缓存");
-                    return;
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                    EasyLog.log("本地缓存读取失败");
-                    Log.d("DiskSaver", "本地缓存读取失败");
-                    return;
-                }
-                String[] lines = data.split("\n");
-                for (String line : lines)
-                {
-                    String[] vs = line.split(" ");
-                    String id = vs[0];
-                    Song song = new Song();
-                    song.url = vs[1];
-                    song.size = Integer.valueOf(vs[2]);
-                    song.br = Integer.valueOf(vs[3]);
-                    song.md5 = vs[4];
-                    items.put(id, song);
-                    Log.d("DiskSaver", song.toString());
-                }
-                EasyLog.log("本地缓存加载完毕");
-                Log.d("DiskSaver", "本地缓存加载完毕");
-            }
-
-            @Override
-            public void update(String id, Object value)
-            {
-                Song song = (Song) value;
-                try
-                {
-                    FileOutputStream outputStream = new FileOutputStream(getCacheFile(), true);
-                    String line = id + " " + song.url + " " + song.size + " " + song.br + " " + song.md5 + "\n";
-                    outputStream.write(line.getBytes());
-                    outputStream.close();
-                } catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onCacheHit(String id, Object value)
-            {
-                Song song = (Song) value;
-                EasyLog.log("本地缓存命中：" + song.url);
-                Log.d("DiskSaver", "本地缓存命中：" + song.url);
-            }
-        };
-
         providerSongs = new Cache(new AddAction()
         {
             @Override
@@ -188,5 +109,10 @@ public class Cache
                 return Search.search(keyword);
             }
         });
+    }
+
+    public static void Clear()
+    {
+        providerSongs.items.clear();
     }
 }

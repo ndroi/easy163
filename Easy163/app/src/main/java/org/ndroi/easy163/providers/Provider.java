@@ -36,19 +36,26 @@ public abstract class Provider
 
     static protected String keyword2Query(Keyword keyword)
     {
-        String str = keyword.songName;
+        String singers = "";
         for (String singer : keyword.singers)
         {
-            str += (" " + singer);
+            singers += (singer + " ");
         }
+        singers.substring(0, singers.length() - 1);
+        if(singers.split(" ").length >= 3)
+        {
+            singers = "";
+            Log.d("keyword2Query", "too many spaces singer string, aborted");
+        }
+        String queryStr = keyword.songName + " " + singers;
         try
         {
-            str = URLEncoder.encode(str, "UTF-8");
+            queryStr = URLEncoder.encode(queryStr, "UTF-8");
         } catch (UnsupportedEncodingException e)
         {
             e.printStackTrace();
         }
-        return str;
+        return queryStr;
     }
 
     static private int calculateScore(Keyword candidateKeyword, Keyword targetKeyword, int index)
@@ -63,7 +70,7 @@ public abstract class Provider
         int candidateLen = candidateSongName.length();
         int targetLen = targetName.length();
         score -= Math.abs(candidateLen - targetLen);
-        String leftName = candidateSongName.replace(targetName, " ");
+        String leftName = candidateSongName.replace(targetName, "");
         List<String> words = Arrays.asList(
                 "live", "dj", "remix", "cover", "instrumental", "伴奏", "翻唱", "翻自"
         );
@@ -92,7 +99,6 @@ public abstract class Provider
                 }
             }
         }
-        Log.d("calculateScore", candidateKeyword.toString() + '|' + targetKeyword.toString() + "|" + score);
         return score;
     }
 
@@ -107,6 +113,7 @@ public abstract class Provider
             {
                 Keyword candidateKeyword = provider.candidateKeywords.get(i);
                 int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
+                Log.d("calculateScore", candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
                 if(score > maxScore)
                 {
                     maxScore = score;

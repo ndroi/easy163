@@ -61,9 +61,17 @@ public class LocalVPNService extends VpnService
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            executorService.shutdownNow();
-            cleanup();
-            LocalVPNService.this.stopSelf();
+            String cmd = intent.getStringExtra("cmd");
+            if(cmd.equals("stop"))
+            {
+                executorService.shutdownNow();
+                cleanup();
+                LocalVPNService.this.stopSelf();
+            }else if(cmd.equals("check"))
+            {
+                Log.i(TAG, "checkServiceState received");
+                sendState();
+            }
         }
     };
 
@@ -73,7 +81,7 @@ public class LocalVPNService extends VpnService
         super.onCreate();
         context = getApplicationContext();
         setupVPN();
-        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("stop"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("activity"));
         deviceToNetworkUDPQueue = new ArrayBlockingQueue<Packet>(1000);
         deviceToNetworkTCPQueue = new ArrayBlockingQueue<Packet>(1000);
         networkToDeviceQueue = new ArrayBlockingQueue<>(1000);
@@ -157,9 +165,7 @@ public class LocalVPNService extends VpnService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        Intent replyIntent=  new Intent("service");
-        replyIntent.putExtra("isRunning", isRunning);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(replyIntent);
+        sendState();
         return START_STICKY;
     }
 
@@ -180,6 +186,13 @@ public class LocalVPNService extends VpnService
         deviceToNetworkUDPQueue = null;
         networkToDeviceQueue = null;
         closeResources(vpnInterface);
+    }
+
+    private void sendState()
+    {
+        Intent replyIntent=  new Intent("service");
+        replyIntent.putExtra("isRunning", isRunning);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(replyIntent);
     }
 
     // TODO: Move this to a "utils" class for reuse

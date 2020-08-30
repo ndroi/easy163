@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
+        syncServiceState();
         EasyLog.setTextView(findViewById(R.id.log));
     }
 
@@ -91,7 +92,8 @@ public class MainActivity extends AppCompatActivity
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
                     "如无法使用请重启音乐软件\n" +
-                    "如遇到设备网络异常请关闭本软件");
+                    "如遇到设备网络异常请关闭本软件\n" +
+                    "清空音乐软件缓存后注意重启本软件");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -161,6 +163,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void syncServiceState()
+    {
+        Intent intent = new Intent("activity");
+        intent.putExtra("cmd", "check");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
     private void startVPN()
     {
         Intent vpnIntent = VpnService.prepare(this);
@@ -172,7 +181,9 @@ public class MainActivity extends AppCompatActivity
 
     private void stopVPN()
     {
-        LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent("stop"));
+        Intent intent = new Intent("activity");
+        intent.putExtra("cmd", "stop");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         Log.d("stopVPN", "try to stopVPN");
     }
 
