@@ -9,6 +9,12 @@
 工作原理：  
 在本地搭建 VPN 服务，拦截修改重定向网易云 APP 的 HTTP 请求，从其他音乐平台获取资源
 
+特性：
+1. 支持 VIP 和下架歌曲播放
+2. 任意歌曲下载
+3. 支持收藏（不支持 Like）
+4. 高精度歌曲匹配算法
+
 已知问题：   
 1. 用户自身个人主页不可用，暂时无解
 2. 下载时若长时间显示正在计算文件长度然后失败，点击重试即可
@@ -18,6 +24,11 @@
 如无法使用请重启网易云  
 开启本软件后如遇到设备网络异常请关闭本软件  
 
+
+软件图例：
+<img src="https://s1.ax1x.com/2020/09/01/dzpIZ8.md.jpg" alt="dzpIZ8.md.jpg" border="0">
+<img src="https://s1.ax1x.com/2020/09/01/dzpTIg.md.jpg" alt="dzpTIg.md.jpg" border="0">
+<img src="https://s1.ax1x.com/2020/09/01/dzpodS.md.jpg" alt="dzpodS.md.jpg" border="0">
 说明：    
 开启本软件后网易云 APP 所有的 HTTP 请求皆由本软件代理，如质疑其安全性欢迎审阅源码并自行编译 APK     
 本软件为实验性项目，请勿用于非法用途      
