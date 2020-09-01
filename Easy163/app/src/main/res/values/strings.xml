@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Easy163</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">easy163</string>
-    <string name="nav_header_subtitle">github.com/ndroi</string>
-    <string name="nav_header_desc">Navigation header</string>
+    <string name="service_is_running">服务正在运行</string>
+    <string name="service_is_not_running">服务未运行</string>
+    <string name="tap_to_start_service">点按以启动服务</string>
+    <string name="tap_to_stop_service">点按以停止服务</string>
+
 </resources>
