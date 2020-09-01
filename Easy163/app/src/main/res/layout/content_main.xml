@@ -1,41 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:layout_gravity="center"
+  app:layout_behavior="@string/appbar_scrolling_view_behavior"
+  tools:context=".ui.MainActivity">
+
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ui.MainActivity"
-    android:layout_gravity="center"
-    tools:showIn="@layout/app_bar_main">
-
-<LinearLayout
-    android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:orientation="vertical">
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="500dp"
-        android:paddingTop="20dp"
-        android:paddingBottom="30dp"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
-        android:gravity="bottom"
-        android:scrollbars="vertical"
-        android:fadeScrollbars="false"
-        android:longClickable="false"
-        android:autoLink="web"
-        android:id="@+id/log"/>
+      android:id="@+id/log"
+      android:layout_width="match_parent"
+      android:layout_height="500dp"
+      android:paddingTop="20dp"
+      android:paddingBottom="30dp"
+      android:paddingLeft="15dp"
+      android:paddingRight="15dp"
+      android:autoLink="web"
+      android:fadeScrollbars="false"
+      android:gravity="bottom"
+      android:longClickable="false"
+      android:scrollbars="vertical" />
 
     <ToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        style="@android:style/Widget.Material.Light.Button.Toggle"
-        android:textOn="服务开启中，点击关闭"
-        android:textOff="服务关闭中，点击开启"
-        android:id="@+id/bt_start"/>
-</LinearLayout>
+      android:id="@+id/bt_start"
+      style="@android:style/Widget.Material.Light.Button.Toggle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textOff="服务关闭中，点击开启"
+      android:textOn="服务开启中，点击关闭" />
+  </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
