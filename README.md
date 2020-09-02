@@ -34,4 +34,10 @@
 
 感谢 [https://github.com/mightofcode/android-vpnservice] 实现了轻量易用的 Android VPN 代理程序
 
-欢迎点赞项目，提交问题
+
+捐赠支持（支付宝）：
+
+<img src="https://s1.ax1x.com/2020/09/02/w9Ns1O.jpg" alt="捐赠支持" width="20%" />
+
+你们的支持是我维护的动力，欢迎点赞项目，提交问题
+
