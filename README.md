@@ -38,7 +38,7 @@
 
 捐赠支持（支付宝）：
 
-<img src="https://wx1.sinaimg.cn/mw690/00622KNxgy1gid7nhrxw8j30mx0mxad9.jpg" alt="捐赠支持" width="20%" />
+<img src="https://wx1.sinaimg.cn/mw690/00622KNxgy1gid7nhrxw8j30mx0mxad9.jpg" alt="捐赠支持" width="30%" />
 
 你们的支持是我维护的动力，欢迎点赞项目，提交问题
 
