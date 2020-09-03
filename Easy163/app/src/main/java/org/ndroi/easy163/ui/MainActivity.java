@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
                     "如无法使用请重启音乐软件\n" +
                     "如遇到设备网络异常请关闭本软件\n" +
-                    "清空音乐软件缓存后注意重启本软件");
+                    "清空音乐软件缓存后请重启本软件");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         {
             Builder builder = new Builder(this);
             builder.setTitle("免责声明");
-            builder.setMessage("本软件为实验性项目\n仅提供技术研究使用\n请勿用于非法用途");
+            builder.setMessage("本软件为实验性项目\n仅提供技术研究使用\n请勿用于非法用途\n作者不承担软件用户造成的一切责任");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
