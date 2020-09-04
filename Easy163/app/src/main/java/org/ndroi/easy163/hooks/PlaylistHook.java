@@ -87,6 +87,7 @@ public class PlaylistHook extends BaseHook
                 {
                     String songId = object.getString("id");
                     Keyword keyword = new Keyword();
+                    keyword.id = songId;
                     keyword.applyRawSongName(object.getString("name"));
                     for (Object singerObj : object.getJSONArray("ar"))
                     {

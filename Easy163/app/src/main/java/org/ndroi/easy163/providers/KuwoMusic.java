@@ -1,16 +1,15 @@
 package org.ndroi.easy163.providers;
 
-import android.util.Log;
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.security.acl.LastOwnerException;
 import java.util.Arrays;
 
 public class KuwoMusic extends Provider
@@ -41,7 +40,6 @@ public class KuwoMusic extends Provider
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
-                Log.d("KuwoMusic", str);
                 if (jsonObject.getIntValue("code") == 200)
                 {
                     JSONArray candidates = jsonObject.getJSONObject("data").getJSONArray("list");
@@ -71,6 +69,20 @@ public class KuwoMusic extends Provider
         }
         JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
         String mId = songJsonObject.getString("musicrid");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("mid", mId);
+        Song song = fetchSongByJson(jsonObject);
+        if(song != null)
+        {
+            Local.put(targetKeyword.id, "kuwo", jsonObject);
+        }
+        return song;
+    }
+
+    @Override
+    public Song fetchSongByJson(JSONObject jsonObject)
+    {
+        String mId = jsonObject.getString("mid");
         if(mId == null)
         {
             return null;

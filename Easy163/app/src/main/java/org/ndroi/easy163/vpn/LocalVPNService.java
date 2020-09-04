@@ -18,6 +18,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Cache;
+import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.core.Server;
 import org.ndroi.easy163.ui.MainActivity;
 import org.ndroi.easy163.utils.EasyLog;
@@ -92,10 +93,12 @@ public class LocalVPNService extends VpnService
                 deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
         startNotification();
         Server.getInstance().start();
-        Cache.Init();
+        EasyLog.log("Easy163 VPN 开始运行");
+        EasyLog.log("版本更新关注 Github Release");
+        Cache.init();
+        Local.load();
         isRunning = true;
         Log.i(TAG, "Easy163 VPN 开始运行");
-        EasyLog.log("Easy163 VPN 开始运行");
     }
 
     private void startNotification()

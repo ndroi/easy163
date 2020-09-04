@@ -18,9 +18,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 import org.ndroi.easy163.BuildConfig;
 import org.ndroi.easy163.R;
+import org.ndroi.easy163.core.Cache;
+import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.LocalVPNService;
 import static android.support.v7.app.AlertDialog.Builder;
@@ -59,7 +62,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
-        syncServiceState();
+        //syncServiceState();
         EasyLog.setTextView(findViewById(R.id.log));
     }
 
@@ -93,7 +96,8 @@ public class MainActivity extends AppCompatActivity
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
                     "如无法使用请重启音乐软件\n" +
                     "如遇到设备网络异常请关闭本软件\n" +
-                    "清空音乐软件缓存后请重启本软件");
+                    "清空音乐软件缓存后请重启本软件\n" +
+                    "更多问题请查阅 Github");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -107,7 +111,10 @@ public class MainActivity extends AppCompatActivity
         {
             Builder builder = new Builder(this);
             builder.setTitle("免责声明");
-            builder.setMessage("本软件为实验性项目\n仅提供技术研究使用\n请勿用于非法用途\n作者不承担软件用户造成的一切责任");
+            builder.setMessage("本软件为实验性项目\n" +
+                    "仅提供技术研究使用\n" +
+                    "本软件完全免费\n" +
+                    "作者不承担用户因软件造成的一切责任");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override
@@ -117,6 +124,11 @@ public class MainActivity extends AppCompatActivity
                 }
             });
             builder.show();
+        } else if (id == R.id.nav_clear_cache)
+        {
+            Cache.clear();
+            Local.clear();
+            Toast.makeText(this, "缓存已清除", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_donate)
         {
             Builder builder = new Builder(this);
@@ -135,7 +147,8 @@ public class MainActivity extends AppCompatActivity
         {
             Builder builder = new Builder(this);
             builder.setTitle("关于");
-            builder.setMessage("当前版本 " + BuildConfig.VERSION_NAME + "\n版本更新请关注 Github Release");
+            builder.setMessage("当前版本 " + BuildConfig.VERSION_NAME + "\n" +
+                    "版本更新关注 Github Release");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
                 @Override

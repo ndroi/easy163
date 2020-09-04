@@ -48,6 +48,10 @@ public abstract class Provider
             Log.d("keyword2Query", "too many spaces singer string, aborted");
         }
         String queryStr = keyword.songName + " " + singers;
+        if(queryStr.length() > 20)
+        {
+            queryStr = queryStr.substring(0, 20);
+        }
         try
         {
             queryStr = URLEncoder.encode(queryStr, "UTF-8");
@@ -105,7 +109,7 @@ public abstract class Provider
     static public Provider selectCandidateKeywords(List<Provider> providers)
     {
         Provider bestProvider = null;
-        int maxScore = -100;
+        int maxScore = -999;
         int selectIndex = -1;
         for (Provider provider : providers)
         {
@@ -170,4 +174,5 @@ public abstract class Provider
 
     abstract public void collectCandidateKeywords();
     abstract public Song fetchSelectedSong();
+    abstract public Song fetchSongByJson(JSONObject jsonObject);
 }

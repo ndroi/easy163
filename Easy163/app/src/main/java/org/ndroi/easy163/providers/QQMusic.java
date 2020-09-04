@@ -2,6 +2,8 @@ package org.ndroi.easy163.providers;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
+import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
@@ -87,8 +89,28 @@ public class QQMusic extends Provider
         }
         JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
         String mId = songJsonObject.getString("mid");
-        String mediaId = songJsonObject.getJSONObject("file").getString("media_mid");
-        String filename = "M500" + mediaId + ".mp3";
+        String mediaMId = songJsonObject.getJSONObject("file").getString("media_mid");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("mid", mId);
+        jsonObject.put("media_mid", mediaMId);
+        Song song = fetchSongByJson(jsonObject);
+        if(song != null)
+        {
+            Local.put(targetKeyword.id, "qq", jsonObject);
+        }
+        return song;
+    }
+
+    @Override
+    public Song fetchSongByJson(JSONObject jsonObject)
+    {
+        String mId = jsonObject.getString("mid");
+        String mediaMId = jsonObject.getString("media_mid");
+        if(mId == null || mediaMId == null)
+        {
+            return null;
+        }
+        String filename = "M500" + mediaMId + ".mp3";
         String url = "https://u.y.qq.com/cgi-bin/musicu.fcg?data=" +
                 "{\"req_0\":{\"module\":\"vkey.GetVkeyServer\"," +
                 "\"method\":\"CgiGetVkey\",\"param\":{\"guid\":\"7332953645\"," +
@@ -108,10 +130,10 @@ public class QQMusic extends Provider
             {
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
-                JSONObject jsonObject = JSONObject.parseObject(str);
-                if (jsonObject.getIntValue("code") == 0)
+                JSONObject jo = JSONObject.parseObject(str);
+                if (jo.getIntValue("code") == 0)
                 {
-                    String vkey = jsonObject.getJSONObject("req_0")
+                    String vkey = jo.getJSONObject("req_0")
                             .getJSONObject("data")
                             .getJSONArray("midurlinfo")
                             .getJSONObject(0)
