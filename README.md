@@ -34,7 +34,7 @@
 捐赠支持（支付宝）：
 
 **捐赠链接 https://qr.alipay.com/fkx11633kcs1ezhpuvixc2b**
-![image](https://wx1.sinaimg.cn/mw690/00622KNxgy1gidsm87al4j30mx0mxad9.jpg)
+![image](https://wx1.sinaimg.cn/mw690/00622KNxgy1gidsm87al4j30mx0mxad9.jpg=200x200)
 
 **你们的支持是我维护的动力，欢迎点赞项目，提交问题**
 
