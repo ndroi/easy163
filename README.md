@@ -29,17 +29,11 @@
 
 说明：    
 开启本软件后网易云 APP 所有的 HTTP 请求皆由本软件代理，如质疑其安全性欢迎审阅源码并自行编译 APK     
-本软件为实验性项目，请勿用于非法用途      
-目前版本未能测试各个版本的网易云 APP，欢迎经测试后反馈问题    
+本软件为实验性项目，使用完全免费，仅提供技术研究使用，作者不承担用户使用造成的一切责任      
+  
 
-
-**请我喝杯咖啡**
-
-[捐赠](https://qr.alipay.com/fkx11633kcs1ezhpuvixc2b "ailipay")
-
-<img src="https://wx1.sinaimg.cn/mw690/00622KNxgy1gidsm87al4j30mx0mxad9.jpg" width="40%">
-
-**你们的支持是我维护的动力，欢迎点赞项目，提交问题**
+*项目需要频繁维护，希望大家支持*
+*欢迎点赞项目，提交问题*
 
 感谢 [https://github.com/nondanee/UnblockNeteaseMusic] 提供 NodeJS 版网易云助手 
 本项目参考其大量业务逻辑，包括 APP 图标

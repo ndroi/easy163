@@ -124,7 +124,7 @@ public abstract class Provider
             {
                 Keyword candidateKeyword = provider.candidateKeywords.get(i);
                 int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
-                //Log.d("calculateScore", provider.providerName + "|" + candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
+                Log.d("calculateScore", provider.providerName + "|" + candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
                 if(score > maxScore)
                 {
                     maxScore = score;

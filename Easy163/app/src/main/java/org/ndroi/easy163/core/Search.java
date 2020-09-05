@@ -69,15 +69,15 @@ public class Search
             if(song != null)
             {
                 Log.d("search", "from provider:\n" + song.toString());
-                EasyLog.log("搜索到播放链接：" + song.url);
+                EasyLog.log("搜索到音源：" +  bestProvider.getProviderName() + " / " + targetKeyword.toString());
             }else
             {
                 Log.d("search", "fetchSelectedSong failed");
-                EasyLog.log("未搜索到资源：" + targetKeyword.toString());
+                EasyLog.log("未搜索到音源：" + targetKeyword.toString());
             }
             return song;
         }
-        EasyLog.log("未搜索到资源：" + targetKeyword.toString());
+        EasyLog.log("未搜索到音源：" + targetKeyword.toString());
         return null;
     }
 }
