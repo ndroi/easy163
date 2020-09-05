@@ -16,14 +16,6 @@ public class EasyLog
 
     public static void setTextView(TextView textView)
     {
-        textView.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View v)
-            {
-                return true;
-            }
-        });
         logger = new Logger(textView);
     }
 

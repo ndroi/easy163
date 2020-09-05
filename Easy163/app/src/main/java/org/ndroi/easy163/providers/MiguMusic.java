@@ -20,7 +20,7 @@ public class MiguMusic extends Provider
 {
     public MiguMusic(Keyword targetKeyword)
     {
-        super(targetKeyword);
+        super("migu", targetKeyword);
     }
 
     private void setHttpHeader(HttpURLConnection connection)
@@ -121,7 +121,7 @@ public class MiguMusic extends Provider
         Song song = fetchSongByJson(jsonObject);
         if(song != null)
         {
-            Local.put(targetKeyword.id, "migu", jsonObject);
+            Local.put(targetKeyword.id, providerName, jsonObject);
         }
         return song;
     }

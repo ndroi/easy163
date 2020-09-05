@@ -16,7 +16,7 @@ public class KuwoMusic extends Provider
 {
     public KuwoMusic(Keyword targetKeyword)
     {
-        super(targetKeyword);
+        super("kuwo", targetKeyword);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class KuwoMusic extends Provider
         Song song = fetchSongByJson(jsonObject);
         if(song != null)
         {
-            Local.put(targetKeyword.id, "kuwo", jsonObject);
+            Local.put(targetKeyword.id, providerName, jsonObject);
         }
         return song;
     }

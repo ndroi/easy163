@@ -15,7 +15,7 @@ public class QQMusic extends Provider
 {
     public QQMusic(Keyword targetKeyword)
     {
-        super(targetKeyword);
+        super("qq", targetKeyword);
     }
 
     @Override
@@ -96,7 +96,7 @@ public class QQMusic extends Provider
         Song song = fetchSongByJson(jsonObject);
         if(song != null)
         {
-            Local.put(targetKeyword.id, "qq", jsonObject);
+            Local.put(targetKeyword.id, providerName, jsonObject);
         }
         return song;
     }

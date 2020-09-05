@@ -1,6 +1,8 @@
 package org.ndroi.easy163.core;
 
 import android.util.Log;
+
+import org.ndroi.easy163.providers.KugouMusic;
 import org.ndroi.easy163.providers.KuwoMusic;
 import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
@@ -20,7 +22,8 @@ public class Search
         List<Provider> providers = Arrays.asList(
                 new KuwoMusic(targetKeyword),
                 new MiguMusic(targetKeyword),
-                new QQMusic(targetKeyword)
+                new QQMusic(targetKeyword),
+                new KugouMusic(targetKeyword)
         );
         Log.d("search", "start to search: " + targetKeyword.toString());
         EasyLog.log("开始全网搜索：" + targetKeyword.toString());

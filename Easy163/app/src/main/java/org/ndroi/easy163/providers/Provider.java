@@ -18,15 +18,22 @@ import java.util.List;
 
 public abstract class Provider
 {
+    protected String providerName;
     protected Keyword targetKeyword;
     protected int selectedIndex = -1;
     protected List<Keyword> candidateKeywords = new ArrayList<>();
     protected List<JSONObject> songJsonObjects = new ArrayList<>();
 
-    public Provider(Keyword targetKeyword)
+    public Provider(String providerName, Keyword targetKeyword)
     {
+        this.providerName = providerName;
         this.targetKeyword = targetKeyword;
     }
+
+    public String getProviderName()
+    {
+        return providerName;
+    };
 
     @Override
     public String toString()
@@ -117,7 +124,7 @@ public abstract class Provider
             {
                 Keyword candidateKeyword = provider.candidateKeywords.get(i);
                 int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
-                Log.d("calculateScore", candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
+                //Log.d("calculateScore", provider.providerName + "|" + candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
                 if(score > maxScore)
                 {
                     maxScore = score;

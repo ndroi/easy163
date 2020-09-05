@@ -2,6 +2,8 @@ package org.ndroi.easy163.core;
 
 import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
+
+import org.ndroi.easy163.providers.KugouMusic;
 import org.ndroi.easy163.providers.KuwoMusic;
 import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
@@ -15,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Local
@@ -47,13 +51,13 @@ public class Local
         } catch (FileNotFoundException e)
         {
             EasyLog.log("未发现本地缓存");
-            Log.d("DiskSaver", "未发现本地缓存");
+            Log.d("Local", "未发现本地缓存");
             return;
         } catch (IOException e)
         {
             e.printStackTrace();
             EasyLog.log("本地缓存读取失败");
-            Log.d("DiskSaver", "本地缓存读取失败");
+            Log.d("Local", "本地缓存读取失败");
             return;
         }
         String[] lines = data.split("\n");
@@ -66,10 +70,10 @@ public class Local
             item.providerName = line.substring(p1 + 1, p2);
             item.jsonObject = JSONObject.parseObject(line.substring(p2 + 1));
             items.put(id, item);
-            Log.d("DiskSaver", id + "/" + item.providerName + "/" +item.jsonObject.toString());
+            Log.d("Local", id + "/" + item.providerName + "/" +item.jsonObject.toString());
         }
         EasyLog.log("本地缓存加载完毕");
-        Log.d("DiskSaver", "本地缓存加载完毕");
+        Log.d("Local", "本地缓存加载完毕");
     }
 
     public static Song get(String id)
@@ -80,23 +84,22 @@ public class Local
             return null;
         }
         EasyLog.log("本地缓存命中：" + id + " / " + item.providerName);
-        Provider provider = null;
-        switch (item.providerName)
+        List<Provider> providers = Arrays.asList(
+                new KuwoMusic(null),
+                new MiguMusic(null),
+                new QQMusic(null),
+                new KugouMusic(null)
+        );
+        Provider targetProvider = null;
+        for (Provider provider : providers)
         {
-            case "kuwo": {
-                provider = new KuwoMusic(null);
-                break;
-            }
-            case "migu":{
-                provider = new MiguMusic(null);
-                break;
-            }
-            case "qq":{
-                provider = new QQMusic(null);
+            if(provider.getProviderName().equals(item.providerName))
+            {
+                targetProvider = provider;
                 break;
             }
         }
-        Song song = provider.fetchSongByJson(item.jsonObject);
+        Song song = targetProvider.fetchSongByJson(item.jsonObject);
         if(song == null)
         {
             items.remove(id);
