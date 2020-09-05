@@ -39,7 +39,7 @@
 
 **你们的支持是我维护的动力，欢迎点赞项目，提交问题**
 
-感谢 [https://github.com/nondanee/UnblockNeteaseMusic] 提供 NodeJS 版网易云助手，  
+感谢 [https://github.com/nondanee/UnblockNeteaseMusic] 提供 NodeJS 版网易云助手 
 本项目参考其大量业务逻辑，包括 APP 图标
 
 感谢 [https://github.com/mightofcode/android-vpnservice] 实现了轻量易用的 Android VPN 代理程序
