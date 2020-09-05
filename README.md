@@ -33,9 +33,9 @@
 目前版本未能测试各个版本的网易云 APP，欢迎经测试后反馈问题    
 
 
-捐赠支持（支付宝）：
+**请我喝杯咖啡**
 
-**捐赠链接 https://qr.alipay.com/fkx11633kcs1ezhpuvixc2b**
+[捐赠](https://qr.alipay.com/fkx11633kcs1ezhpuvixc2b "ailipay")
 
 <img src="https://wx1.sinaimg.cn/mw690/00622KNxgy1gidsm87al4j30mx0mxad9.jpg" width="40%">
 
