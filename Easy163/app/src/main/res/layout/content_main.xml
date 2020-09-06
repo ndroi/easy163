@@ -25,7 +25,7 @@
             android:gravity="bottom"
             android:typeface="monospace"
             android:scrollbars="vertical"
-            android:fadeScrollbars="false"
+            android:clickable="true"
             android:id="@+id/log" />
 
         <ToggleButton

@@ -94,8 +94,7 @@ public class MainActivity extends AppCompatActivity
             Builder builder = new Builder(this);
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
-                    "如无法使用请重启音乐软件\n" +
-                    "如遇到设备网络异常请关闭本软件\n" +
+                    "如音乐软件无法联网请重启手机\n" +
                     "清空音乐软件缓存后请重启本软件\n" +
                     "更多问题请查阅 Github");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
@@ -129,20 +128,6 @@ public class MainActivity extends AppCompatActivity
             Cache.clear();
             Local.clear();
             Toast.makeText(this, "缓存已清除", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_donate)
-        {
-            Builder builder = new Builder(this);
-            builder.setTitle("捐赠支持");
-            builder.setMessage("暂未开放捐赠\n欢迎 Github 点赞支持");
-            builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
-            {
-                @Override
-                public void onClick(DialogInterface dialog, int which)
-                {
-                    dialog.dismiss();
-                }
-            });
-            builder.show();
         } else if (id == R.id.nav_about)
         {
             Builder builder = new Builder(this);

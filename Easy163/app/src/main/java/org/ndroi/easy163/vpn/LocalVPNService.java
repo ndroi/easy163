@@ -290,14 +290,10 @@ public class LocalVPNService extends VpnService
 
             try
             {
-                ByteBuffer bufferToNetwork = null;
-
                 while (!Thread.interrupted())
                 {
-                    bufferToNetwork = ByteBufferPool.acquire();
+                    ByteBuffer bufferToNetwork = ByteBufferPool.acquire();
                     int readBytes = vpnInput.read(bufferToNetwork);
-
-                    //MainActivity.upByte.addAndGet(readBytes);
 
                     if (readBytes > 0)
                     {
@@ -318,7 +314,7 @@ public class LocalVPNService extends VpnService
                     {
                         try
                         {
-                            Thread.sleep(10);
+                            Thread.sleep(50);
                         } catch (InterruptedException e)
                         {
                             e.printStackTrace();
