@@ -43,22 +43,30 @@ public abstract class Provider
 
     static protected String keyword2Query(Keyword keyword)
     {
+        String songName = keyword.songName;
+        if(songName.length() > 20)
+        {
+            songName = songName.substring(0, 20);
+            Log.d("keyword2Query", "too long songName string, truncated");
+        }
         String singers = "";
         for (String singer : keyword.singers)
         {
             singers += (singer + " ");
         }
-        singers.substring(0, singers.length() - 1);
-        if(singers.split(" ").length >= 3)
+        singers = singers.substring(0, singers.length() - 1);
+        String[] singersSplited = singers.split(" ");
+        if(singersSplited.length > 3)
         {
-            singers = "";
-            Log.d("keyword2Query", "too many spaces singer string, aborted");
+            singers = singersSplited[0] + " "+ singersSplited[1] + " " + singersSplited[2];
+            Log.d("keyword2Query", "too many spaces singer string, truncated");
         }
-        String queryStr = keyword.songName + " " + singers;
-        if(queryStr.length() > 20)
+        if(singers.length() > 10)
         {
-            queryStr = queryStr.substring(0, 20);
+            singers = singers.substring(0, 10);
+            Log.d("keyword2Query", "too long singers string, truncated");
         }
+        String queryStr = songName + " " + singers;
         try
         {
             queryStr = URLEncoder.encode(queryStr, "UTF-8");

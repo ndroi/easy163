@@ -70,7 +70,7 @@ public class Local
             item.providerName = line.substring(p1 + 1, p2);
             item.jsonObject = JSONObject.parseObject(line.substring(p2 + 1));
             items.put(id, item);
-            Log.d("Local", id + "/" + item.providerName + "/" +item.jsonObject.toString());
+            //Log.d("Local", id + "/" + item.providerName + "/" +item.jsonObject.toString());
         }
         EasyLog.log("本地缓存加载完毕");
         Log.d("Local", "本地缓存加载完毕");

@@ -65,7 +65,7 @@ public class KugouMusic extends Provider
             return null;
         }
         JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
-        String mId = songJsonObject.getJSONArray("Grp").getJSONObject(0).getString("FileHash");
+        String mId = songJsonObject.getString("FileHash");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("mid", mId);
         Song song = fetchSongByJson(jsonObject);
