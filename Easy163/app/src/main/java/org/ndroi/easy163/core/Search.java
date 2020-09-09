@@ -65,7 +65,15 @@ public class Search
         if (bestProvider != null)
         {
             Log.d("search", "bestProvider " + bestProvider.toString());
-            Song song = bestProvider.fetchSelectedSong();
+            Song song = null;
+            try
+            {
+                song = bestProvider.fetchSelectedSong();
+            }catch (Exception e)
+            {
+                Log.d("search", "fetchSelectedSong failed");
+                e.printStackTrace();
+            }
             if(song != null)
             {
                 Log.d("search", "from provider:\n" + song.toString());
