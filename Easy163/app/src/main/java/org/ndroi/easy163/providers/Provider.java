@@ -190,4 +190,15 @@ public abstract class Provider
     abstract public void collectCandidateKeywords();
     abstract public Song fetchSelectedSong();
     abstract public Song fetchSongByJson(JSONObject jsonObject);
+
+    public static List<Provider> getProviders(Keyword targetKeyword)
+    {
+        List<Provider> providers = Arrays.asList(
+                new KuwoMusic(targetKeyword),
+                new MiguMusic(targetKeyword),
+                new QQMusic(targetKeyword)
+                //new KugouMusic(targetKeyword)
+        );
+        return providers;
+    }
 }

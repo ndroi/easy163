@@ -84,12 +84,7 @@ public class Local
             return null;
         }
         EasyLog.log("本地缓存命中：" + id + " / " + item.providerName);
-        List<Provider> providers = Arrays.asList(
-                new KuwoMusic(null),
-                new MiguMusic(null),
-                new QQMusic(null),
-                new KugouMusic(null)
-        );
+        List<Provider> providers = Provider.getProviders(null);
         Provider targetProvider = null;
         for (Provider provider : providers)
         {

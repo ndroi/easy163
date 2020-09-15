@@ -24,10 +24,10 @@ public class QQMusic extends Provider
         String query = keyword2Query(targetKeyword);
         String url = "https://c.y.qq.com/soso/fcgi-bin/client_search_cp?" +
                 "ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.center&" +
-                "searchid=46804741196796149&t=0&aggr=1&cr=1&catZhida=1&lossless=0&" +
-                "flag_qc=0&p=1&n=20&w=" + query + "&" +
-                "g_tk=5381&jsonpCallback=MusicJsonCallback10005317669353331&loginUin=0&hostUin=0&" +
-                "format=jsonp&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq&needNewCode=0";
+                "searchid=46343560494538174&t=0&aggr=1&cr=1&catZhida=1&lossless=0&" +
+                "flag_qc=0&p=1&n=10&w=" + query + "&" +
+                "g_tk_new_20200303=5381&g_tk=5381&loginUin=0&hostUin=0&" +
+                "format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0";
         try
         {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -38,9 +38,6 @@ public class QQMusic extends Provider
             {
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
-                int p1 = str.indexOf('(');
-                int p2 = str.lastIndexOf(')');
-                str = str.substring(p1 + 1, p2);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 if (jsonObject.getIntValue("code") == 0)
                 {

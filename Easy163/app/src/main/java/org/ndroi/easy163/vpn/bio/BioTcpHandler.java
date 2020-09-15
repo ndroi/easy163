@@ -210,7 +210,10 @@ public class BioTcpHandler implements Runnable
                 {
                     buffer = HookHttp.getInstance().checkAndHookRequest(tunnel, buffer);
                 }
-                tunnel.destSocket.write(buffer);
+                if(tunnel.destSocket != null) // I don't know why need this
+                {
+                    tunnel.destSocket.write(buffer);
+                }
             }
         }
 

@@ -19,12 +19,7 @@ public class Search
 {
     public static Song search(Keyword targetKeyword)
     {
-        List<Provider> providers = Arrays.asList(
-                new KuwoMusic(targetKeyword),
-                new MiguMusic(targetKeyword),
-                new QQMusic(targetKeyword),
-                new KugouMusic(targetKeyword)
-        );
+        List<Provider> providers = Provider.getProviders(targetKeyword);
         Log.d("search", "start to search: " + targetKeyword.toString());
         EasyLog.log("开始全网搜索：" + targetKeyword.toString());
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
