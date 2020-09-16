@@ -14,19 +14,8 @@ import android.graphics.BitmapFactory;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
-import org.ndroi.easy163.R;
-import org.ndroi.easy163.core.Cache;
-import org.ndroi.easy163.core.Local;
-import org.ndroi.easy163.core.Server;
-import org.ndroi.easy163.ui.MainActivity;
-import org.ndroi.easy163.utils.EasyLog;
-import org.ndroi.easy163.vpn.bio.BioTcpHandler;
-import org.ndroi.easy163.vpn.bio.BioUdpHandler;
-import org.ndroi.easy163.vpn.config.Config;
-import org.ndroi.easy163.vpn.tcpip.Packet;
-import org.ndroi.easy163.vpn.util.ByteBufferPool;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.Closeable;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
@@ -38,6 +27,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.ndroi.easy163.R;
+import org.ndroi.easy163.core.Cache;
+import org.ndroi.easy163.core.Local;
+import org.ndroi.easy163.core.Server;
+import org.ndroi.easy163.ui.MainActivity;
+import org.ndroi.easy163.utils.EasyLog;
+import org.ndroi.easy163.vpn.bio.BioTcpHandler;
+import org.ndroi.easy163.vpn.bio.BioUdpHandler;
+import org.ndroi.easy163.vpn.config.Config;
+import org.ndroi.easy163.vpn.tcpip.Packet;
+import org.ndroi.easy163.vpn.util.ByteBufferPool;
 
 public class LocalVPNService extends VpnService
 {
@@ -51,11 +51,6 @@ public class LocalVPNService extends VpnService
     private ExecutorService executorService;
     private Boolean isRunning = false;
     private static Context context = null;
-
-    public static Context getContext()
-    {
-        return context;
-    }
 
     private BroadcastReceiver stopReceiver = new BroadcastReceiver()
     {

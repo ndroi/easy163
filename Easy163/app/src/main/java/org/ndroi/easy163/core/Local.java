@@ -2,25 +2,19 @@ package org.ndroi.easy163.core;
 
 import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
-
-import org.ndroi.easy163.providers.KugouMusic;
-import org.ndroi.easy163.providers.KuwoMusic;
-import org.ndroi.easy163.providers.MiguMusic;
-import org.ndroi.easy163.providers.Provider;
-import org.ndroi.easy163.providers.QQMusic;
-import org.ndroi.easy163.utils.EasyLog;
-import org.ndroi.easy163.utils.ReadStream;
-import org.ndroi.easy163.utils.Song;
-import org.ndroi.easy163.vpn.LocalVPNService;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.ndroi.easy163.providers.Provider;
+import org.ndroi.easy163.ui.MainActivity;
+import org.ndroi.easy163.utils.EasyLog;
+import org.ndroi.easy163.utils.ReadStream;
+import org.ndroi.easy163.utils.Song;
 
 public class Local
 {
@@ -35,13 +29,13 @@ public class Local
 
     private static File getCacheFile()
     {
-        File cacheDir = LocalVPNService.getContext().getCacheDir();
+        File cacheDir = MainActivity.getContext().getCacheDir();
         return new File(cacheDir, diskFilename);
     }
 
     public static void load()
     {
-        String data = "";
+        String data;
         try
         {
             FileInputStream inputStream = new FileInputStream(getCacheFile());
@@ -115,9 +109,6 @@ public class Local
             String line = id + " " + providerName + " " + jsonObject.toString() + "\n";
             outputStream.write(line.getBytes());
             outputStream.close();
-        } catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
         } catch (IOException e)
         {
             e.printStackTrace();
