@@ -15,26 +15,27 @@ import org.ndroi.easy163.vpn.hookhttp.Response;
 /**
  * Created by andro on 2020/5/3.
  */
-public class PlaylistHook extends BaseHook {
-
-  private List<String> paths = Arrays.asList(
-      "/playlist/detail",
-      "/eapi/playlist/v4/detail",
-      "/eapi/play-record/playlist/list",
-      "/eapi/album/v3/detail",
-      "/discovery/recommend/songs",
-      "/eapi/album/privilege",
-      "/eapi/batch",
-      "/artist/privilege",
-      "/eapi/artist/top/song",
-      "/eapi/v3/song/detail",
-      "/eapi/song/enhance/privilege",
-      "/eapi/song/enhance/info/get",
-      "/search/song/get",
-      "/search/complex/get/",
-      "/eapi/v1/artist/songs",
-      "/eapi/v1/search/get"
-  );
+public class PlaylistHook extends BaseHook
+{
+    private List<String> paths = Arrays.asList(
+            "/playlist/detail",
+            "/eapi/playlist/v4/detail",
+            "/eapi/play-record/playlist/list",
+            "/eapi/album/v3/detail",
+            "/discovery/recommend/songs",
+            "/eapi/album/privilege",
+            "/eapi/playlist/privilege",
+            "/eapi/batch",
+            "/artist/privilege",
+            "/eapi/artist/top/song",
+            "/eapi/v3/song/detail",
+            "/eapi/song/enhance/privilege",
+            "/eapi/song/enhance/info/get",
+            "/search/song/get",
+            "/search/complex/get/",
+            "/eapi/v1/artist/songs",
+            "/eapi/v1/search/get"
+    );
 
   @Override
   public boolean rule(Request request) {
@@ -69,23 +70,31 @@ public class PlaylistHook extends BaseHook {
     response.setContent(bytes);
   }
 
-  private void cacheKeywords(JSONObject jsonObject) {
-    JsonUtil.traverse(jsonObject, object -> {
-      if (object.containsKey("id") &&
-          object.containsKey("name") &&
-          object.containsKey("ar")) {
-        String songId = object.getString("id");
-        Keyword keyword = new Keyword();
-        keyword.applyRawSongName(object.getString("name"));
-
-        for (Object singerObj : object.getJSONArray("ar")) {
-          JSONObject singer = (JSONObject) singerObj;
-          keyword.singers.add(singer.getString("name"));
-        }
-        Cache.neteaseKeywords.add(songId, keyword);
-      }
-    });
-  }
+    private void cacheKeywords(JSONObject jsonObject)
+    {
+        JsonUtil.traverse(jsonObject, new JsonUtil.Rule()
+        {
+            @Override
+            public void apply(JSONObject object)
+            {
+                if (object.containsKey("id") &&
+                        object.containsKey("name") &&
+                        object.containsKey("ar"))
+                {
+                    String songId = object.getString("id");
+                    Keyword keyword = new Keyword();
+                    keyword.id = songId;
+                    keyword.applyRawSongName(object.getString("name"));
+                    for (Object singerObj : object.getJSONArray("ar"))
+                    {
+                        JSONObject singer = (JSONObject) singerObj;
+                        keyword.singers.add(singer.getString("name"));
+                    }
+                    Cache.neteaseKeywords.add(songId, keyword);
+                }
+            }
+        });
+    }
 
   private void modifyPrivileges(JSONObject jsonObject) {
     JsonUtil.traverse(jsonObject, object -> {

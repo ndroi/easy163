@@ -8,7 +8,8 @@ public class ByteBufferPool
 
     public static ByteBuffer acquire()
     {
-        return ByteBuffer.allocate(BUFFER_SIZE);
+        //return ByteBuffer.allocate(BUFFER_SIZE);
+        return ByteBuffer.allocateDirect(BUFFER_SIZE);
     }
 }
 

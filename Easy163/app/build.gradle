@@ -11,9 +11,9 @@ android {
         applicationId "org.ndroi.easy163"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 13
-        versionName "1.6.6"
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        versionCode 18
+        versionName "1.7.6"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
         release {

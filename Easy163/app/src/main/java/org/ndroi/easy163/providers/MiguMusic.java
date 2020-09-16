@@ -3,6 +3,7 @@ package org.ndroi.easy163.providers;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
+import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.providers.utils.MiguCrypto;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.ConcurrencyTask;
@@ -15,11 +16,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MiguMusic extends Provider {
-
-  public MiguMusic(Keyword targetKeyword) {
-    super(targetKeyword);
-  }
+public class MiguMusic extends Provider
+{
+    public MiguMusic(Keyword targetKeyword)
+    {
+        super("migu", targetKeyword);
+    }
 
   private void setHttpHeader(HttpURLConnection connection) {
     connection.setRequestProperty("origin", "https://music.migu.cn/");
@@ -96,35 +98,51 @@ public class MiguMusic extends Provider {
     }
   }
 
-  @Override
-  public Song fetchSelectedSong() {
-    if (selectedIndex == -1) {
-      return null;
-    }
-
-    JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
-    String mId = songJsonObject.getString("copyrightId");
-    ConcurrencyTask concurrencyTask = new ConcurrencyTask();
-    Map<String, String> typeSongUrls = new HashMap<>();
-
-    for (String type : new String[]{"1", "2"}) {
-      concurrencyTask.addTask(new Thread() {
-        @Override
-        public void run() {
-          super.run();
-          requestSongUrl(mId, type, typeSongUrls);
+    @Override
+    public Song fetchSelectedSong()
+    {
+        if(selectedIndex == -1)
+        {
+            return null;
         }
-      });
+        JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
+        String mId = songJsonObject.getString("copyrightId");
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("mid", mId);
+        Song song = fetchSongByJson(jsonObject);
+        if(song != null)
+        {
+            Local.put(targetKeyword.id, providerName, jsonObject);
+        }
+        return song;
     }
 
-    concurrencyTask.waitAll();
-
-    if (typeSongUrls.containsKey("2")) {
-      return generateSong(typeSongUrls.get("2"));
+    @Override
+    public Song fetchSongByJson(JSONObject jsonObject)
+    {
+        String mId = jsonObject.getString("mid");
+        ConcurrencyTask concurrencyTask = new ConcurrencyTask();
+        Map<String, String> typeSongUrls = new HashMap<>();
+        for (String type : new String[]{"1", "2"})
+        {
+            concurrencyTask.addTask(new Thread(){
+                @Override
+                public void run()
+                {
+                    super.run();
+                    requestSongUrl(mId, type, typeSongUrls);
+                }
+            });
+        }
+        concurrencyTask.waitAll();
+        if(typeSongUrls.containsKey("2"))
+        {
+            return generateSong(typeSongUrls.get("2"));
+        }
+        if(typeSongUrls.containsKey("1"))
+        {
+            return generateSong(typeSongUrls.get("1"));
+        }
+        return null;
     }
-    if (typeSongUrls.containsKey("1")) {
-      return generateSong(typeSongUrls.get("1"));
-    }
-    return null;
-  }
 }

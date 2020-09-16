@@ -6,11 +6,12 @@ import java.util.List;
 /**
  * Created by andro on 2020/5/5.
  */
-public class Keyword {
-
-  public String songName;
-  public List<String> singers = new ArrayList<>();
-  public String extra = null; // extra songName info in (xxx)
+public class Keyword
+{
+    public String id;
+    public String songName;
+    public List<String> singers = new ArrayList<>();
+    public String extra = null; // extra songName info in (xxx)
 
   public void applyRawSongName(String rawSongName) {
     int p = rawSongName.indexOf('(');

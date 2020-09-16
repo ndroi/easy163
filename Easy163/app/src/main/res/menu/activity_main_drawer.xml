@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_github"
+            android:title="Github 地址" />
+        <item
+            android:id="@+id/nav_usage"
+            android:title="使用说明" />
+        <item
+            android:id="@+id/nav_statement"
+            android:title="免责声明" />
+        <item
+            android:id="@+id/nav_clear_cache"
+            android:title="清除缓存" />
+        <item
+            android:id="@+id/nav_about"
+            android:title="关于" />
+    </group>
+
+</menu>

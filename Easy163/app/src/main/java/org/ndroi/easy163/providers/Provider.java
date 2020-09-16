@@ -16,45 +16,66 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public abstract class Provider {
+public abstract class Provider
+{
+    protected String providerName;
+    protected Keyword targetKeyword;
+    protected int selectedIndex = -1;
+    protected List<Keyword> candidateKeywords = new ArrayList<>();
+    protected List<JSONObject> songJsonObjects = new ArrayList<>();
 
-  protected Keyword targetKeyword;
-  protected int selectedIndex = -1;
-  protected List<Keyword> candidateKeywords = new ArrayList<>();
-  protected List<JSONObject> songJsonObjects = new ArrayList<>();
-
-  public Provider(Keyword targetKeyword) {
-    this.targetKeyword = targetKeyword;
-  }
-
-  @Override
-  public String toString() {
-    return getClass().getSimpleName();
-  }
-
-  static protected String keyword2Query(Keyword keyword) {
-    StringBuilder singers = new StringBuilder();
-
-    for (String singer : keyword.singers) {
-      singers.append(singer).append(" ");
+    public Provider(String providerName, Keyword targetKeyword)
+    {
+        this.providerName = providerName;
+        this.targetKeyword = targetKeyword;
     }
 
-    singers.substring(0, singers.length() - 1);
+    public String getProviderName()
+    {
+        return providerName;
+    };
 
-    if (singers.toString().split(" ").length >= 3) {
-      singers = new StringBuilder();
-      Log.d("keyword2Query", "too many spaces singer string, aborted");
+    @Override
+    public String toString()
+    {
+        return getClass().getSimpleName();
     }
 
-    String queryStr = keyword.songName + " " + singers;
-
-    try {
-      queryStr = URLEncoder.encode(queryStr, "UTF-8");
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
+    static protected String keyword2Query(Keyword keyword)
+    {
+        String songName = keyword.songName;
+        if(songName.length() > 20)
+        {
+            songName = songName.substring(0, 20);
+            Log.d("keyword2Query", "too long songName string, truncated");
+        }
+        String singers = "";
+        for (String singer : keyword.singers)
+        {
+            singers += (singer + " ");
+        }
+        singers = singers.substring(0, singers.length() - 1);
+        String[] singersSplited = singers.split(" ");
+        if(singersSplited.length > 3)
+        {
+            singers = singersSplited[0] + " "+ singersSplited[1] + " " + singersSplited[2];
+            Log.d("keyword2Query", "too many spaces singer string, truncated");
+        }
+        if(singers.length() > 10)
+        {
+            singers = singers.substring(0, 10);
+            Log.d("keyword2Query", "too long singers string, truncated");
+        }
+        String queryStr = songName + " " + singers;
+        try
+        {
+            queryStr = URLEncoder.encode(queryStr, "UTF-8");
+        } catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+        return queryStr;
     }
-    return queryStr;
-  }
 
   static private int calculateScore(Keyword candidateKeyword, Keyword targetKeyword, int index) {
     if (!KeywordMatch.match(candidateKeyword, targetKeyword)) {
@@ -95,30 +116,32 @@ public abstract class Provider {
     return score;
   }
 
-  static public Provider selectCandidateKeywords(List<Provider> providers) {
-    Provider bestProvider = null;
-    int maxScore = -100;
-    int selectIndex = -1;
-
-    for (Provider provider : providers) {
-      for (int i = 0; i < provider.candidateKeywords.size(); i++) {
-        Keyword candidateKeyword = provider.candidateKeywords.get(i);
-        int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
-        Log.d("calculateScore", candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
-
-        if (score > maxScore) {
-          maxScore = score;
-          selectIndex = i;
-          bestProvider = provider;
+    static public Provider selectCandidateKeywords(List<Provider> providers)
+    {
+        Provider bestProvider = null;
+        int maxScore = -999;
+        int selectIndex = -1;
+        for (Provider provider : providers)
+        {
+            for (int i = 0; i < provider.candidateKeywords.size(); i++)
+            {
+                Keyword candidateKeyword = provider.candidateKeywords.get(i);
+                int score = calculateScore(candidateKeyword, provider.targetKeyword, i);
+                Log.d("calculateScore", provider.providerName + "|" + candidateKeyword.toString() + '|' + provider.targetKeyword.toString() + "|" + score);
+                if(score > maxScore)
+                {
+                    maxScore = score;
+                    selectIndex = i;
+                    bestProvider = provider;
+                }
+            }
         }
-      }
+        if(bestProvider != null)
+        {
+            bestProvider.selectedIndex = selectIndex;
+        }
+        return bestProvider;
     }
-
-    if (bestProvider != null) {
-      bestProvider.selectedIndex = selectIndex;
-    }
-    return bestProvider;
-  }
 
   static protected Song generateSong(String url) {
     Song song = null;
@@ -158,7 +181,18 @@ public abstract class Provider {
     return song;
   }
 
-  abstract public void collectCandidateKeywords();
+    abstract public void collectCandidateKeywords();
+    abstract public Song fetchSelectedSong();
+    abstract public Song fetchSongByJson(JSONObject jsonObject);
 
-  abstract public Song fetchSelectedSong();
+    public static List<Provider> getProviders(Keyword targetKeyword)
+    {
+        List<Provider> providers = Arrays.asList(
+                new KuwoMusic(targetKeyword),
+                new MiguMusic(targetKeyword),
+                new QQMusic(targetKeyword)
+                //new KugouMusic(targetKeyword)
+        );
+        return providers;
+    }
 }
