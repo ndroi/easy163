@@ -13,38 +13,41 @@ public class Keyword
     public List<String> singers = new ArrayList<>();
     public String extra = null; // extra songName info in (xxx)
 
-  public void applyRawSongName(String rawSongName) {
-    int p = rawSongName.indexOf('(');
-
-    if (p == -1) {
-      p = rawSongName.indexOf('（');
+    public void applyRawSongName(String rawSongName)
+    {
+        int p = rawSongName.indexOf('(');
+        if(p == -1)
+        {
+            p = rawSongName.indexOf('（');
+        }
+        if (p != -1)
+        {
+            songName = rawSongName.substring(0, p).trim();
+            int q = rawSongName.indexOf(')', p);
+            if(q == -1)
+            {
+                q = rawSongName.indexOf('）', p);
+            }
+            if(q != -1)
+            {
+                extra = rawSongName.substring(p + 1, q);
+            }
+        }else
+        {
+            songName = rawSongName.trim();
+            extra = null;
+        }
     }
 
-    if (p != -1) {
-      songName = rawSongName.substring(0, p).trim();
-      int q = rawSongName.indexOf(')', p);
-
-      if (q == -1) {
-        q = rawSongName.indexOf('）', p);
-      }
-      if (q != -1) {
-        extra = rawSongName.substring(p + 1, q);
-      }
-    } else {
-      songName = rawSongName.trim();
-      extra = null;
+    @Override
+    public String toString()
+    {
+        String str = songName + "-";
+        for (String singer : singers)
+        {
+            str += singer + '/';
+        }
+        str = str.substring(0, str.length() - 1);
+        return str;
     }
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder str = new StringBuilder(songName + "-");
-
-    for (String singer : singers) {
-      str.append(singer).append('/');
-    }
-
-    str = new StringBuilder(str.substring(0, str.length() - 1));
-    return str.toString();
-  }
 }

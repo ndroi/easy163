@@ -8,42 +8,47 @@ import org.ndroi.easy163.vpn.block.BlockHttp;
 import org.ndroi.easy163.vpn.block.BlockHttps;
 import org.ndroi.easy163.vpn.hookhttp.HookHttp;
 
-public class Server {
+public class Server
+{
+    private static Server instance = new Server();
 
-  private static Server instance = new Server();
+    public static Server getInstance()
+    {
+        return instance;
+    }
 
-  public static Server getInstance() {
-    return instance;
-  }
+    private void setHooks()
+    {
+        HookHttp.getInstance().addHook(new PlaylistHook());
+        HookHttp.getInstance().addHook(new SongPlayHook());
+        HookHttp.getInstance().addHook(new CollectHook());
+        HookHttp.getInstance().addHook(new DownloadHook());
+    }
 
-  private void setHooks() {
-    HookHttp.getInstance().addHook(new PlaylistHook());
-    HookHttp.getInstance().addHook(new SongPlayHook());
-    HookHttp.getInstance().addHook(new CollectHook());
-    HookHttp.getInstance().addHook(new DownloadHook());
-  }
+    private void setHttpsBlock()
+    {
+        /*not used yet*/
+        BlockHttps.getInstance().addHost("music.163.com");
+        BlockHttps.getInstance().addHost("interface3.music.163.com");
+        BlockHttps.getInstance().addHost("interface.music.163.com");
+        BlockHttps.getInstance().addHost("apm.music.163.com");
+        BlockHttps.getInstance().addHost("apm3.music.163.com");
+        BlockHttps.getInstance().addHost("clientlog3.music.163.com");
+        BlockHttps.getInstance().addHost("clientlog.music.163.com");
+    }
 
-  private void setHttpsBlock() {
-    /*not used yet*/
-    BlockHttps.getInstance().addHost("music.163.com");
-    BlockHttps.getInstance().addHost("interface3.music.163.com");
-    BlockHttps.getInstance().addHost("interface.music.163.com");
-    BlockHttps.getInstance().addHost("apm.music.163.com");
-    BlockHttps.getInstance().addHost("apm3.music.163.com");
-    BlockHttps.getInstance().addHost("clientlog3.music.163.com");
-    BlockHttps.getInstance().addHost("clientlog.music.163.com");
-  }
+    private void setHttpBlock()
+    {
+        BlockHttp.getInstance().addHost("apm.music.163.com");
+        BlockHttp.getInstance().addHost("apm3.music.163.com");
+        BlockHttp.getInstance().addHost("clientlog3.music.163.com");
+        BlockHttp.getInstance().addHost("clientlog.music.163.com");
+    }
 
-  private void setHttpBlock() {
-    BlockHttp.getInstance().addHost("apm.music.163.com");
-    BlockHttp.getInstance().addHost("apm3.music.163.com");
-    BlockHttp.getInstance().addHost("clientlog3.music.163.com");
-    BlockHttp.getInstance().addHost("clientlog.music.163.com");
-  }
-
-  public void start() {
-    setHooks();
-    setHttpsBlock();
-    setHttpBlock();
-  }
+    public void start()
+    {
+        setHooks();
+        setHttpsBlock();
+        setHttpBlock();
+    }
 }

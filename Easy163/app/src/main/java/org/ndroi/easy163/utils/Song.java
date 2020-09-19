@@ -7,15 +7,17 @@ package org.ndroi.easy163.utils;
  *  but Android client play need a correct size.
  *  for Android client download, md5 is must.
  * */
-public class Song {
+public class Song
+{
+    public String url = "unknown";
+    public int size = 10 * 1000 * 1000;
+    public int br = 192000;
+    public String md5 = "unknown";
 
-  public String url = "unknown";
-  public int size = 10 * 1000 * 1000;
-  public int br = 192000;
-  public String md5 = "unknown";
-
-  @Override
-  public String toString() {
-    return "url: " + url + "\nsize: " + size + "\nbr: " + br + "\nmd5: " + md5 + "\n";
-  }
+    @Override
+    public String toString()
+    {
+        String info = "url: " + url + "\nsize: " + size + "\nbr: " + br + "\nmd5: " + md5 + "\n";
+        return info;
+    }
 }

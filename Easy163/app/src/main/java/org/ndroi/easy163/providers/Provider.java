@@ -77,44 +77,49 @@ public abstract class Provider
         return queryStr;
     }
 
-  static private int calculateScore(Keyword candidateKeyword, Keyword targetKeyword, int index) {
-    if (!KeywordMatch.match(candidateKeyword, targetKeyword)) {
-      return -100;
-    }
-
-    int score = 5 - 3 * index;
-    String targetName = targetKeyword.songName.toLowerCase();
-    String candidateSongName = candidateKeyword.songName.toLowerCase();
-    int candidateLen = candidateSongName.length();
-    int targetLen = targetName.length();
-    score -= Math.abs(candidateLen - targetLen);
-    String leftName = candidateSongName.replace(targetName, "");
-    List<String> words = Arrays.asList(
-        "live", "dj", "remix", "cover", "instrumental", "伴奏", "翻唱", "翻自"
-    );
-
-    for (String word : words) {
-      if (KeywordMatch.match(word, leftName)) {
-        if (KeywordMatch.match(word, targetKeyword.extra)) {
-          score = 7;
-        } else {
-          score -= 2;
+    static private int calculateScore(Keyword candidateKeyword, Keyword targetKeyword, int index)
+    {
+        if(!KeywordMatch.match(candidateKeyword, targetKeyword))
+        {
+            return -100;
         }
-      }
-    }
-
-    score -= Math.abs(targetKeyword.singers.size() - candidateKeyword.singers.size());
-
-    for (String targetSinger : targetKeyword.singers) {
-      for (String candidateSinger : candidateKeyword.singers) {
-        if (KeywordMatch.match(targetSinger, candidateSinger)) {
-          score += 2;
-          score -= 2 * Math.abs(targetSinger.length() - candidateSinger.length());
+        int score = 5 - 3*index;
+        String targetName = targetKeyword.songName.toLowerCase();
+        String candidateSongName = candidateKeyword.songName.toLowerCase();
+        int candidateLen = candidateSongName.length();
+        int targetLen = targetName.length();
+        score -= Math.abs(candidateLen - targetLen);
+        String leftName = candidateSongName.replace(targetName, "");
+        List<String> words = Arrays.asList(
+                "live", "dj", "remix", "cover", "instrumental", "伴奏", "翻唱", "翻自"
+        );
+        for (String word : words)
+        {
+            if(KeywordMatch.match(word, leftName))
+            {
+                if(KeywordMatch.match(word, targetKeyword.extra))
+                {
+                    score = 7;
+                }else
+                {
+                    score -= 2;
+                }
+            }
         }
-      }
+        score -= Math.abs(targetKeyword.singers.size() - candidateKeyword.singers.size());
+        for (String targetSinger : targetKeyword.singers)
+        {
+            for (String candidateSinger : candidateKeyword.singers)
+            {
+                if (KeywordMatch.match(targetSinger, candidateSinger))
+                {
+                    score += 2;
+                    score -= 2*Math.abs(targetSinger.length() - candidateSinger.length());
+                }
+            }
+        }
+        return score;
     }
-    return score;
-  }
 
     static public Provider selectCandidateKeywords(List<Provider> providers)
     {
@@ -143,43 +148,44 @@ public abstract class Provider
         return bestProvider;
     }
 
-  static protected Song generateSong(String url) {
-    Song song = null;
-
-    try {
-      HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-      connection.setRequestMethod("GET");
-      connection.setRequestProperty("range", "bytes=0-8191");
-      connection.connect();
-      int responseCode = connection.getResponseCode();
-
-      if (responseCode == HttpURLConnection.HTTP_OK ||
-          responseCode == HttpURLConnection.HTTP_PARTIAL) {
-        song = new Song();
-        song.url = url;
-        String content_range = connection.getHeaderField("Content-Range");
-
-        if (content_range != null) {
-          int p = content_range.indexOf('/');
-          song.size = Integer.parseInt(content_range.substring(p + 1));
-        } else {
-          song.size = connection.getContentLength();
+    static protected Song generateSong(String url)
+    {
+        Song song = null;
+        try
+        {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestMethod("GET");
+            connection.setRequestProperty("range", "bytes=0-8191");
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK ||
+                    responseCode == HttpURLConnection.HTTP_PARTIAL)
+            {
+                song = new Song();
+                song.url = url;
+                String content_range = connection.getHeaderField("Content-Range");
+                if (content_range != null)
+                {
+                    int p = content_range.indexOf('/');
+                    song.size = Integer.parseInt(content_range.substring(p + 1));
+                } else
+                {
+                    song.size = connection.getContentLength();
+                }
+                String qqMusicMd5 = connection.getHeaderField("Server-Md5");
+                if (qqMusicMd5 != null)
+                {
+                    song.md5 = qqMusicMd5;
+                }
+                byte[] mp3Data = ReadStream.read(connection.getInputStream());
+                song.br = BitRate.Detect(mp3Data);
+            }
+        } catch (IOException e)
+        {
+            e.printStackTrace();
         }
-
-        String qqMusicMd5 = connection.getHeaderField("Server-Md5");
-
-        if (qqMusicMd5 != null) {
-          song.md5 = qqMusicMd5;
-        }
-
-        byte[] mp3Data = ReadStream.read(connection.getInputStream());
-        song.br = BitRate.Detect(mp3Data);
-      }
-    } catch (IOException e) {
-      e.printStackTrace();
+        return song;
     }
-    return song;
-  }
 
     abstract public void collectCandidateKeywords();
     abstract public Song fetchSelectedSong();
