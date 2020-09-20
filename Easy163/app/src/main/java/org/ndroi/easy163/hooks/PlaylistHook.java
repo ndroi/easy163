@@ -84,8 +84,7 @@ public class PlaylistHook extends BaseHook
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         cacheKeywords(jsonObject);
         modifyPrivileges(jsonObject);
-        bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
-        bytes = Crypto.aesEncrypt(bytes);
+        bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();bytes = Crypto.aesEncrypt(bytes);
         Log.d("ResponsePlaylist hooked:",new String(bytes));
         response.setContent(bytes);
     }
