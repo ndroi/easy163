@@ -17,6 +17,7 @@ import org.ndroi.easy163.vpn.hookhttp.Response;
  */
 public class SongPlayHook extends BaseHook
 {
+    public boolean isRewind = false;
     @Override
     public boolean rule(Request request)
     {

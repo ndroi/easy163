@@ -50,15 +50,13 @@ public class PlaylistHook extends BaseHook
         String host = request.getHeaderFields().get("host");
         Log.d("check rule Host", Host + "" + getPath(request));
         Log.d("check rule host", host + "" + getPath(request));
-//        if(host != null)
-//        {
-//            if(method.equals("GET") && host.endsWith("music.163.com"))
-//            {
-//                Log.d("check rule","Rewind");
-//                isRewind = true;
-//                return false;
-//            }
-//        }
+        if(host != null)
+        {
+            if(method.equals("GET") && host.endsWith("music.163.com"))
+            {
+                return false;
+            }
+        }
         if(Host != null)
         {
             if (!method.equals("POST") || !Host.endsWith("music.163.com"))
