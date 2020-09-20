@@ -45,13 +45,27 @@ public class PlaylistHook extends BaseHook
     public boolean rule(Request request)
     {
         String method = request.getMethod();
-        String host = request.getHeaderFields().get("Host");
-        Log.d("check rule", host + "" + getPath(request));
-        if (!method.equals("POST") || !host.endsWith("music.163.com"))
-        {
-            return false;
-        }
         String path = getPath(request);
+        String Host = request.getHeaderFields().get("Host");
+        String host = request.getHeaderFields().get("host");
+        Log.d("check rule Host", Host + "" + getPath(request));
+        Log.d("check rule host", host + "" + getPath(request));
+//        if(host != null)
+//        {
+//            if(method.equals("GET") && host.endsWith("music.163.com"))
+//            {
+//                Log.d("check rule","Rewind");
+//                isRewind = true;
+//                return false;
+//            }
+//        }
+        if(Host != null)
+        {
+            if (!method.equals("POST") || !Host.endsWith("music.163.com"))
+            {
+                return false;
+            }
+        }
         for (String p : paths)
         {
             if (path.contains(p))
@@ -66,12 +80,15 @@ public class PlaylistHook extends BaseHook
     public void hookResponse(Response response)
     {
         super.hookResponse(response);
-        byte[] bytes = Crypto.aesDecrypt(response.getContent());
+        byte[] bytes = response.getContent();
+        Log.d("ResponsePlaylist:",new String(bytes));
+        bytes = Crypto.aesDecrypt(bytes);
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         cacheKeywords(jsonObject);
         modifyPrivileges(jsonObject);
         bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
         bytes = Crypto.aesEncrypt(bytes);
+        Log.d("ResponsePlaylist hooked:",new String(bytes));
         response.setContent(bytes);
     }
 

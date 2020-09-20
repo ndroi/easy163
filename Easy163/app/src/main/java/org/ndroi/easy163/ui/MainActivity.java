@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         {
             Builder builder = new Builder(this);
             builder.setTitle("关于");
-            builder.setMessage("当前版本 " + BuildConfig.VERSION_NAME + "\n" +
+            builder.setMessage("当前版本" + BuildConfig.VERSION_NAME + "\n" + "由@Revincx添加了对倒带的支持和通知栏快捷设置" + "\n" +
                     "版本更新关注 Github Release");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {

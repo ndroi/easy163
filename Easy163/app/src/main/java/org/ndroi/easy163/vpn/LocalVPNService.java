@@ -154,6 +154,14 @@ public class LocalVPNService extends VpnService
                     {
                         Log.d(TAG, "未检测到网易云音乐极速版");
                     }
+                    try
+                    {
+                        builder.addAllowedApplication("com.kuss.rewind");
+                    }
+                    catch (PackageManager.NameNotFoundException e)
+                    {
+                        Log.d(TAG,"未检测到倒带");
+                    }
                 }
                 vpnInterface = builder.setSession(getString(R.string.app_name)).establish();
             }

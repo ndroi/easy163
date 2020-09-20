@@ -21,12 +21,26 @@ public class SongPlayHook extends BaseHook
     public boolean rule(Request request)
     {
         String method = request.getMethod();
-        String host = request.getHeaderFields().get("Host");
-        if (!method.equals("POST") || !host.endsWith("music.163.com"))
-        {
-            return false;
-        }
+        String Host = request.getHeaderFields().get("Host");
+        String host = request.getHeaderFields().get("host");
         String path = getPath(request);
+        if(host != null)
+        {
+            if(method.equals("GET") && host.endsWith("music.163.com") && path.contains("/song/enhance/player/url"))
+            {
+                Log.d("check rule","Rewind");
+                isRewind = true;
+                return true;
+            }
+        }
+        if(Host != null)
+        {
+            if (!method.equals("POST") || !Host.endsWith("music.163.com"))
+            {
+                return false;
+            }
+        }
+
         return path.contains("/song/enhance/player/url");
     }
 
@@ -34,38 +48,76 @@ public class SongPlayHook extends BaseHook
     {
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         JSONArray songObjects = jsonObject.getJSONArray("data");
-        for (Object obj : songObjects)
+        if(!isRewind)
         {
-            JSONObject songObject = (JSONObject) obj;
-            if (songObject.getJSONObject("freeTrialInfo") != null || songObject.getIntValue("code") != 200)
+            for (Object obj : songObjects)
             {
-                concurrencyTask.addTask(new Thread()
+                JSONObject songObject = (JSONObject) obj;
+                if (songObject.getJSONObject("freeTrialInfo") != null || songObject.getIntValue("code") != 200)
                 {
-                    @Override
-                    public void run()
+                    concurrencyTask.addTask(new Thread()
                     {
-                        super.run();
-                        String id = songObject.getString("id");
-                        Song providerSong = (Song) Cache.providerSongs.get(id);
-                        if (providerSong == null)
+                        @Override
+                        public void run()
                         {
-                            Log.d("SongPlayHook", "no provider found");
-                            return;
+                            super.run();
+                            String id = songObject.getString("id");
+                            Song providerSong = (Song) Cache.providerSongs.get(id);
+                            if (providerSong == null)
+                            {
+                                Log.d("SongPlayHook", "no provider found");
+                                return;
+                            }
+                            songObject.put("fee", 0);
+                            songObject.put("code", 200);
+                            songObject.put("url", providerSong.url);
+                            songObject.put("md5", providerSong.md5);
+                            songObject.put("br", providerSong.br);
+                            songObject.put("size", providerSong.size);
+                            songObject.put("freeTrialInfo", null);
+                            songObject.put("level", "standard");
+                            songObject.put("type", "mp3");
+                            songObject.put("encodeType", "mp3");
                         }
-                        songObject.put("fee", 0);
-                        songObject.put("code", 200);
-                        songObject.put("url", providerSong.url);
-                        songObject.put("md5", providerSong.md5);
-                        songObject.put("br", providerSong.br);
-                        songObject.put("size", providerSong.size);
-                        songObject.put("freeTrialInfo", null);
-                        songObject.put("level", "standard");
-                        songObject.put("type", "mp3");
-                        songObject.put("encodeType", "mp3");
-                    }
-                });
+                    });
+                }
             }
         }
+        else
+        {
+            for (Object obj : songObjects)
+            {
+                JSONObject songObject = (JSONObject) obj;
+                if (songObject.getJSONObject("freeTrialInfo") != null || songObject.getJSONObject("url") == null)
+                {
+                    concurrencyTask.addTask(new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            super.run();
+                            String id = songObject.getString("id");
+                            Song providerSong = (Song) Cache.providerSongs.get(id);
+                            if (providerSong == null)
+                            {
+                                Log.d("SongPlayHook", "no provider found");
+                                return;
+                            }
+                            songObject.put("fee", 0);;
+                            songObject.put("url", providerSong.url);
+                            songObject.put("md5", providerSong.md5);
+                            songObject.put("br", providerSong.br);
+                            songObject.put("size", providerSong.size);
+                            songObject.put("freeTrialInfo", null);
+                            songObject.put("level", "standard");
+                            songObject.put("type", "mp3");
+                            songObject.put("encodeType", "mp3");
+                        }
+                    });
+                }
+            }
+        }
+
         concurrencyTask.waitAll();
     }
 
@@ -73,11 +125,20 @@ public class SongPlayHook extends BaseHook
     public void hookResponse(Response response)
     {
         super.hookResponse(response);
-        byte[] bytes = Crypto.aesDecrypt(response.getContent());
+        byte[] bytes = response.getContent();
+        Log.d("ResponseSong:",new String(bytes));
+        if (!isRewind)
+        {
+            bytes = Crypto.aesDecrypt(bytes);
+        }
         JSONObject jsonObject = JSONObject.parseObject(new String(bytes));
         handleNoFreeSong(jsonObject);
         bytes = JSONObject.toJSONString(jsonObject, SerializerFeature.WriteMapNullValue).getBytes();
-        bytes = Crypto.aesEncrypt(bytes);
+        if(!isRewind)
+        {
+            bytes = Crypto.aesEncrypt(bytes);
+        }
+        Log.d("ResponseSong hooked:",new String(bytes));
         response.setContent(bytes);
     }
 }
