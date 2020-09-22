@@ -25,6 +25,7 @@ import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.EasyLog;
+import org.ndroi.easy163.utils.QuickTileService;
 import org.ndroi.easy163.vpn.LocalVPNService;
 import static android.support.v7.app.AlertDialog.Builder;
 
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity
         toggleButton.setOnCheckedChangeListener(this);
         //syncServiceState();
         EasyLog.setTextView(findViewById(R.id.log));
+
     }
 
     @Override
@@ -132,7 +134,7 @@ public class MainActivity extends AppCompatActivity
         {
             Builder builder = new Builder(this);
             builder.setTitle("关于");
-            builder.setMessage("当前版本" + BuildConfig.VERSION_NAME + "\n" + "由@Revincx添加了对倒带的支持和通知栏快捷设置" + "\n" +
+            builder.setMessage("当前版本" + BuildConfig.VERSION_NAME + "\n\n" + "由@Revincx添加了对倒带的支持和通知栏快捷设置" + "\n\n" +
                     "版本更新关注 Github Release");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
@@ -191,6 +193,9 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
         {
+            Intent cmdIntent = new Intent("activity");
+            cmdIntent.putExtra("cmd", "start");
+            LocalBroadcastManager.getInstance(this).sendBroadcast(cmdIntent);
             Intent intent = new Intent(this, LocalVPNService.class);
             startService(intent);
         }
