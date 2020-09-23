@@ -46,6 +46,12 @@ public class KuwoMusic extends Provider
                     for (Object obj : candidates)
                     {
                         JSONObject songJsonObject = (JSONObject) obj;
+                        // I think it means 'isListenFree'
+                        boolean isListenFree = songJsonObject.getBooleanValue("isListenFee");
+                        if(!isListenFree)
+                        {
+                            continue;
+                        }
                         Keyword candidateKeyword = new Keyword();
                         candidateKeyword.songName = songJsonObject.getString("name");
                         candidateKeyword.singers = Arrays.asList(songJsonObject.getString("artist").split("&"));

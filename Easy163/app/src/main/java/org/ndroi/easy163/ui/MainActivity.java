@@ -1,5 +1,6 @@
 package org.ndroi.easy163.ui;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -8,13 +9,13 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import com.google.android.material.navigation.NavigationView;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -26,7 +27,8 @@ import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.LocalVPNService;
-import static android.support.v7.app.AlertDialog.Builder;
+import java.util.List;
+import static androidx.appcompat.app.AlertDialog.Builder;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ToggleButton.OnCheckedChangeListener
@@ -62,8 +64,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         toggleButton = findViewById(R.id.bt_start);
         toggleButton.setOnCheckedChangeListener(this);
-        //syncServiceState();
         EasyLog.setTextView(findViewById(R.id.log));
+        syncServiceState();
     }
 
     @Override
@@ -79,7 +81,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item)
     {
@@ -161,11 +162,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private boolean isVPNServiceRunning()
+    {
+        final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
+        for (ActivityManager.RunningServiceInfo runningServiceInfo : services)
+        {
+            if (runningServiceInfo.service.getClass().equals(LocalVPNService.class))
+            {
+                //Toast.makeText(this, "服务存活", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void syncServiceState()
     {
-        Intent intent = new Intent("activity");
-        intent.putExtra("cmd", "check");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+//        Intent intent = new Intent("activity");
+//        intent.putExtra("cmd", "check");
+//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        boolean running = isVPNServiceRunning();
+        if(running)
+        {
+            EasyLog.log("Easy163 VPN 服务存活");
+        }
+        toggleButton.setChecked(running);
     }
 
     private void startVPN()

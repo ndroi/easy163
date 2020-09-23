@@ -2,12 +2,7 @@ package org.ndroi.easy163.core;
 
 import android.util.Log;
 import com.alibaba.fastjson.JSONObject;
-
-import org.ndroi.easy163.providers.KugouMusic;
-import org.ndroi.easy163.providers.KuwoMusic;
-import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
-import org.ndroi.easy163.providers.QQMusic;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Song;
@@ -17,7 +12,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +35,7 @@ public class Local
 
     public static void load()
     {
+        items.clear();
         String data = "";
         try
         {
@@ -70,7 +65,6 @@ public class Local
             item.providerName = line.substring(p1 + 1, p2);
             item.jsonObject = JSONObject.parseObject(line.substring(p2 + 1));
             items.put(id, item);
-            //Log.d("Local", id + "/" + item.providerName + "/" +item.jsonObject.toString());
         }
         EasyLog.log("本地缓存加载完毕");
         Log.d("Local", "本地缓存加载完毕");
@@ -83,7 +77,7 @@ public class Local
         {
             return null;
         }
-        EasyLog.log("本地缓存命中：" + id + " / " + item.providerName);
+        EasyLog.log("本地缓存命中：" + "[" + item.providerName + "] " + id);
         List<Provider> providers = Provider.getProviders(null);
         Provider targetProvider = null;
         for (Provider provider : providers)
@@ -94,11 +88,15 @@ public class Local
                 break;
             }
         }
-        Song song = targetProvider.fetchSongByJson(item.jsonObject);
-        if(song == null)
+        Song song = null;
+        if(targetProvider != null)
         {
-            items.remove(id);
-            EasyLog.log("本地缓存失效：" + id + " / " + item.providerName);
+            song = targetProvider.fetchSongByJson(item.jsonObject);
+            if(song == null)
+            {
+                items.remove(id);
+                EasyLog.log("本地缓存失效：" + "[" + item.providerName + "] " + id);
+            }
         }
         return song;
     }

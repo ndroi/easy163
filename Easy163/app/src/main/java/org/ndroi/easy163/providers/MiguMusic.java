@@ -49,6 +49,10 @@ public class MiguMusic extends Provider
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 JSONArray candidates = jsonObject.getJSONArray("musics");
+                if(candidates == null)
+                {
+                    return;
+                }
                 for (Object infoObj : candidates)
                 {
                     JSONObject songJSONObject = (JSONObject) infoObj;

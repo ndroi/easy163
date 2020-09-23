@@ -14,7 +14,7 @@ import android.graphics.BitmapFactory;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Cache;
@@ -24,7 +24,6 @@ import org.ndroi.easy163.ui.MainActivity;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.bio.BioTcpHandler;
 import org.ndroi.easy163.vpn.bio.BioUdpHandler;
-import org.ndroi.easy163.vpn.config.Config;
 import org.ndroi.easy163.vpn.tcpip.Packet;
 import org.ndroi.easy163.vpn.util.ByteBufferPool;
 import java.io.Closeable;
@@ -198,7 +197,6 @@ public class LocalVPNService extends VpnService
         LocalBroadcastManager.getInstance(this).sendBroadcast(replyIntent);
     }
 
-    // TODO: Move this to a "utils" class for reuse
     private static void closeResources(Closeable... resources)
     {
         for (Closeable resource : resources)
@@ -254,51 +252,34 @@ public class LocalVPNService extends VpnService
                     {
                         ByteBuffer bufferFromNetwork = networkToDeviceQueue.take();
                         bufferFromNetwork.flip();
-
                         while (bufferFromNetwork.hasRemaining())
                         {
                             int w = vpnOutput.write(bufferFromNetwork);
-                            if (w > 0)
-                            {
-                                //MainActivity.downByte.addAndGet(w);
-                            }
-
-                            if (Config.logRW)
-                            {
-                                Log.d(TAG, "vpn write " + w);
-                            }
                         }
                     } catch (Exception e)
                     {
                         Log.i(TAG, "WriteVpnThread fail", e);
                     }
-
                 }
-
             }
         }
 
         @Override
         public void run()
         {
-            //Log.i(TAG, "Started");
-
             FileChannel vpnInput = new FileInputStream(vpnFileDescriptor).getChannel();
             FileChannel vpnOutput = new FileOutputStream(vpnFileDescriptor).getChannel();
             Thread t = new Thread(new WriteVpnThread(vpnOutput, networkToDeviceQueue));
             t.start();
-
             try
             {
                 while (!Thread.interrupted())
                 {
                     ByteBuffer bufferToNetwork = ByteBufferPool.acquire();
                     int readBytes = vpnInput.read(bufferToNetwork);
-
                     if (readBytes > 0)
                     {
                         bufferToNetwork.flip();
-
                         Packet packet = new Packet(bufferToNetwork);
                         if (packet.isUDP())
                         {
@@ -331,4 +312,3 @@ public class LocalVPNService extends VpnService
         }
     }
 }
-

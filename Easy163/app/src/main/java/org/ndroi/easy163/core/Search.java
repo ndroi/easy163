@@ -1,17 +1,11 @@
 package org.ndroi.easy163.core;
 
 import android.util.Log;
-
-import org.ndroi.easy163.providers.KugouMusic;
-import org.ndroi.easy163.providers.KuwoMusic;
-import org.ndroi.easy163.providers.MiguMusic;
 import org.ndroi.easy163.providers.Provider;
-import org.ndroi.easy163.providers.QQMusic;
 import org.ndroi.easy163.utils.ConcurrencyTask;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.utils.Keyword;
 import org.ndroi.easy163.utils.Song;
-import java.util.Arrays;
 import java.util.List;
 
 /* search Song from providers */
@@ -72,7 +66,8 @@ public class Search
             if(song != null)
             {
                 Log.d("search", "from provider:\n" + song.toString());
-                EasyLog.log("搜索到音源：" +  bestProvider.getProviderName() + " / " + targetKeyword.toString());
+                EasyLog.log("搜索到音源：" +  "[" + bestProvider.getProviderName() + "] " +
+                        bestProvider.getSelectedKeyword().toString());
             }else
             {
                 Log.d("search", "fetchSelectedSong failed");

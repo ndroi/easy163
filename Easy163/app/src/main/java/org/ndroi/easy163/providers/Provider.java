@@ -35,6 +35,15 @@ public abstract class Provider
         return providerName;
     };
 
+    public Keyword getSelectedKeyword()
+    {
+        if(selectedIndex == -1)
+        {
+            return null;
+        }
+        return candidateKeywords.get(selectedIndex);
+    };
+
     @Override
     public String toString()
     {
@@ -52,20 +61,15 @@ public abstract class Provider
         String singers = "";
         for (String singer : keyword.singers)
         {
-            singers += (singer + " ");
+            String tmp = singers + singer + " ";
+            if(tmp.length() > 15)
+            {
+                Log.d("keyword2Query", "too long singers string, truncated");
+                break;
+            }
+            singers = tmp;
         }
         singers = singers.substring(0, singers.length() - 1);
-        String[] singersSplited = singers.split(" ");
-        if(singersSplited.length > 3)
-        {
-            singers = singersSplited[0] + " "+ singersSplited[1] + " " + singersSplited[2];
-            Log.d("keyword2Query", "too many spaces singer string, truncated");
-        }
-        if(singers.length() > 10)
-        {
-            singers = singers.substring(0, 10);
-            Log.d("keyword2Query", "too long singers string, truncated");
-        }
         String queryStr = songName + " " + singers;
         try
         {
@@ -81,7 +85,7 @@ public abstract class Provider
     {
         if(!KeywordMatch.match(candidateKeyword, targetKeyword))
         {
-            return -100;
+            return -(50 + 3*index);
         }
         int score = 5 - 3*index;
         String targetName = targetKeyword.songName.toLowerCase();
@@ -113,8 +117,8 @@ public abstract class Provider
             {
                 if (KeywordMatch.match(targetSinger, candidateSinger))
                 {
-                    score += 2;
-                    score -= 2*Math.abs(targetSinger.length() - candidateSinger.length());
+                    score += 3;
+                    score -= Math.abs(targetSinger.length() - candidateSinger.length());
                 }
             }
         }
