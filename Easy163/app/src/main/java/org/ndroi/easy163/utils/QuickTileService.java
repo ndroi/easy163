@@ -13,16 +13,30 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.ndroi.easy163.R;
-import org.ndroi.easy163.core.Server;
 import org.ndroi.easy163.ui.MainActivity;
 import org.ndroi.easy163.vpn.LocalVPNService;
 
-import java.lang.ref.SoftReference;
-import java.util.List;
 
 public class QuickTileService extends TileService
 {
+
+    private BroadcastReceiver tileReceiver = new BroadcastReceiver()
+    {
+        @Override
+        public void onReceive(Context context, Intent intent)
+        {
+            String cmd = intent.getStringExtra("cmd");
+            if(cmd.equals("start"))
+            {
+                getQsTile().setState(Tile.STATE_ACTIVE);
+            }
+            else if(cmd.equals("stop"))
+            {
+                getQsTile().setState(Tile.STATE_INACTIVE);
+            }
+            getQsTile().updateTile();
+        }
+    };
 
     @Override
     public void onTileAdded()
@@ -32,17 +46,17 @@ public class QuickTileService extends TileService
     }
 
     @Override
-    public void onStartListening() {
+    public void onStartListening()
+    {
         super.onStartListening();
-
+        registerReceiver(tileReceiver,new IntentFilter("activity"));
     }
 
-//    @Override
-//    public void onCreate()
-//    {
-//        super.onCreate();
-//        registerReceiver(tileReceiver, new IntentFilter("activity"));
-//    }
+    @Override
+    public void onStopListening() {
+        super.onStopListening();
+        unregisterReceiver(tileReceiver);
+    }
 
     @Override
     public void onClick() {
@@ -81,10 +95,5 @@ public class QuickTileService extends TileService
         getQsTile().updateTile();
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getQsTile().setState(Tile.STATE_INACTIVE);
-        getQsTile().updateTile();
-    }
+
 }

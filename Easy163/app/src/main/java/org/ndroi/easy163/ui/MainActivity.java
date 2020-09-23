@@ -1,6 +1,7 @@
 package org.ndroi.easy163.ui;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
+import android.service.quicksettings.TileService;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
@@ -181,6 +183,7 @@ public class MainActivity extends AppCompatActivity
 
     private void stopVPN()
     {
+        TileService.requestListeningState(this,new ComponentName(BuildConfig.APPLICATION_ID,QuickTileService.class.getName()));
         Intent intent = new Intent("activity");
         intent.putExtra("cmd", "stop");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -193,6 +196,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
         {
+            TileService.requestListeningState(this,new ComponentName(BuildConfig.APPLICATION_ID,QuickTileService.class.getName()));
             Intent cmdIntent = new Intent("activity");
             cmdIntent.putExtra("cmd", "start");
             LocalBroadcastManager.getInstance(this).sendBroadcast(cmdIntent);
