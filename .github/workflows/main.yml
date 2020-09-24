@@ -1,0 +1,72 @@
+# workflow的名称，会显示在github 的项目的Actions的右边列表中，如下图
+name: GEN_APK
+
+# 在满足以下条件触发这个workflow
+on:
+  push:
+    # 在指定的远程分支上，发生推送
+    branches:
+      - master
+jobs:
+# 多个job，如果有多个，每个以“-”开头
+  first-job:
+    # 该job 运行的系统环境，支持ubuntu 、windows、macOS
+    runs-on: ubuntu-latest
+    steps:
+      # 下面是多个step ，每个以“-”开头
+      # step：检查分支
+      - uses: actions/checkout@v1
+      # step：设置jdk版本
+      # step 名称
+      - name: set up JDK 1.8
+        # 引用公共action
+        uses: actions/setup-java@v1
+        with:
+          # 设置参数
+          java-version: 1.8
+      # step：打包apk
+      - name: Build with Gradle
+        # 运行命令
+        run: chmod +x gradlew &&./gradlew assembleRelease
+
+
+      #step：上传apk 到action，在右上角查看
+      # 官方文档 https://help.github.com/cn/actions/automating-your-workflow-with-github-actions/persisting-workflow-data-using-artifacts#uploading-build-and-test-artifacts
+      - name: Upload APK
+        uses: actions/upload-artifact@v1
+        with:
+          name: app
+          path: Easy163/app/build/outputs/apk/release/app.apk
+
+      #step： 获取apk版本号
+      - name: Get Apk Info
+        #step id
+        id: apk
+        uses: JantHsueh/get-apk-info-action@master
+        with:
+          apkPath: app/build/outputs/apk/debug/xw-debug.apk
+
+        #获取指定时区的时间
+      - name: Get Time
+        id: time
+        uses: JantHsueh/get-time-action@master
+        with:
+          timeZone: 8
+
+
+      # 调用接口修改数据库的版本号
+      - name: Update SoftwareVersion
+        uses: JantHsueh/webrequest-action@master
+        with:
+          url: https://www.adsff123.com/app/guest/updateSoftwareVersion
+          method: POST
+          # ${{ steps.apk.outputs.versionCode }} 使用id为apk的step的输出参数versionCode 
+          payload: '{"id":1,"softwareType":1,"recommend":1,"versionDesc":"App自动发布成功，时间 ${{ steps.time.outputs.time}} \n5分钟后再点更新 \n8分钟后也可以 \n10分钟后最好","version":"${{ steps.apk.outputs.versionNum }}","versionNum":${{ steps.apk.outputs.versionCode }}}'
+          headers: '{"Content-Type": "application/json","authorization":"${{ secrets.update_software_version_key }}","platform":"android"}'
+
+        #获取git log
+      - name: Get git log
+        id: git_log
+        uses: JantHsueh/get-git-log-action@master
+        with:
+          tag: release
