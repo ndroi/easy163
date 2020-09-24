@@ -36,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: app
-          path: Easy163/app/build/outputs/apk/release/app.apk
+          path: app/build/outputs/apk/release/app-release.apk
 
       #step： 获取apk版本号
       - name: Get Apk Info
@@ -52,17 +52,6 @@ jobs:
         uses: JantHsueh/get-time-action@master
         with:
           timeZone: 8
-
-
-      # 调用接口修改数据库的版本号
-      - name: Update SoftwareVersion
-        uses: JantHsueh/webrequest-action@master
-        with:
-          url: https://www.adsff123.com/app/guest/updateSoftwareVersion
-          method: POST
-          # ${{ steps.apk.outputs.versionCode }} 使用id为apk的step的输出参数versionCode 
-          payload: '{"id":1,"softwareType":1,"recommend":1,"versionDesc":"App自动发布成功，时间 ${{ steps.time.outputs.time}} \n5分钟后再点更新 \n8分钟后也可以 \n10分钟后最好","version":"${{ steps.apk.outputs.versionNum }}","versionNum":${{ steps.apk.outputs.versionCode }}}'
-          headers: '{"Content-Type": "application/json","authorization":"${{ secrets.update_software_version_key }}","platform":"android"}'
 
         #获取git log
       - name: Get git log
