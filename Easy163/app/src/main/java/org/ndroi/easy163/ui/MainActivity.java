@@ -34,16 +34,24 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ToggleButton.OnCheckedChangeListener
 {
     private static final int VPN_REQUEST_CODE = 0x0F;
-    ToggleButton toggleButton = null;
+    private ToggleButton toggleButton = null;
+    private boolean isBroadcastReceived = false; // workaround for multi-receive
 
     private BroadcastReceiver serviceReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
+            if(isBroadcastReceived) return;
             boolean isServiceRunning = intent.getBooleanExtra("isRunning", false);
             Log.d("MainActivity", "BroadcastReceiver service isRunning: " + isServiceRunning);
             toggleButton.setChecked(isServiceRunning);
+            if(isServiceRunning)
+            {
+                EasyLog.log("Easy163 VPN 正在运行");
+                EasyLog.log("版本更新关注 Github Release");
+            }
+            isBroadcastReceived = true;
         }
     };
 
@@ -69,6 +77,13 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceReceiver);
+    }
+
+    @Override
     public void onBackPressed()
     {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -77,7 +92,11 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else
         {
-            super.onBackPressed();
+            //super.onBackPressed();
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            startActivity(intent);
         }
     }
 
@@ -153,6 +172,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
+        isBroadcastReceived = false;
         if (isChecked)
         {
             startVPN();
@@ -162,32 +182,12 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private boolean isVPNServiceRunning()
-    {
-        final ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        final List<ActivityManager.RunningServiceInfo> services = activityManager.getRunningServices(Integer.MAX_VALUE);
-        for (ActivityManager.RunningServiceInfo runningServiceInfo : services)
-        {
-            if (runningServiceInfo.service.getClass().equals(LocalVPNService.class))
-            {
-                //Toast.makeText(this, "服务存活", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void syncServiceState()
     {
-//        Intent intent = new Intent("activity");
-//        intent.putExtra("cmd", "check");
-//        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        boolean running = isVPNServiceRunning();
-        if(running)
-        {
-            EasyLog.log("Easy163 VPN 服务存活");
-        }
-        toggleButton.setChecked(running);
+        Intent intent = new Intent("activity");
+        intent.putExtra("cmd", "check");
+        isBroadcastReceived = false;
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     private void startVPN()

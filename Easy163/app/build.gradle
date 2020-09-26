@@ -11,8 +11,8 @@ android {
         applicationId "org.ndroi.easy163"
         minSdkVersion 24
         targetSdkVersion 29
-        versionCode 20
-        versionName "1.7.8"
+        versionCode 21
+        versionName "1.8.0"
     }
     buildTypes {
         release {

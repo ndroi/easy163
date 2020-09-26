@@ -92,12 +92,10 @@ public class LocalVPNService extends VpnService
                 deviceToNetworkUDPQueue, deviceToNetworkTCPQueue, networkToDeviceQueue));
         startNotification();
         Server.getInstance().start();
-        EasyLog.log("Easy163 VPN 开始运行");
-        EasyLog.log("版本更新关注 Github Release");
         Cache.init();
         Local.load();
         isRunning = true;
-        Log.i(TAG, "Easy163 VPN 开始运行");
+        Log.i(TAG, "Easy163 VPN 启动");
     }
 
     private void startNotification()
@@ -175,9 +173,11 @@ public class LocalVPNService extends VpnService
     public void onDestroy()
     {
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(stopReceiver);
         executorService.shutdownNow();
         cleanup();
         isRunning = false;
+        sendState();
         EasyLog.log("Easy163 VPN 停止运行");
         Log.i(TAG, "Stopped");
     }
