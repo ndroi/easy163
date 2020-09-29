@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -46,12 +48,6 @@ public class KuwoMusic extends Provider
                     for (Object obj : candidates)
                     {
                         JSONObject songJsonObject = (JSONObject) obj;
-                        // I think it means 'isListenFree'
-                        boolean isListenFree = songJsonObject.getBooleanValue("isListenFee");
-                        if(!isListenFree)
-                        {
-                            continue;
-                        }
                         Keyword candidateKeyword = new Keyword();
                         candidateKeyword.songName = songJsonObject.getString("name");
                         candidateKeyword.singers = Arrays.asList(songJsonObject.getString("artist").split("&"));
@@ -105,6 +101,7 @@ public class KuwoMusic extends Provider
             {
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String songUrl = new String(content);
+                Log.d("Kuwo", songUrl);
                 if (songUrl.startsWith("http"))
                 {
                     song = generateSong(songUrl);

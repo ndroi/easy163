@@ -20,6 +20,8 @@
                 <action android:name="android.net.VpnService" />
             </intent-filter>
         </service>
+        <service android:name=".ui.EasyTileService" />
+
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/app_name"

@@ -51,6 +51,11 @@ public class QQMusic extends Provider
                         {
                             continue;
                         }
+                        int fnote = songJsonObject.getIntValue("fnote");
+                        if (fnote == 4002)
+                        {
+                            continue;
+                        }
                         JSONObject files = songJsonObject.getJSONObject("file");
                         if(files.getIntValue("size_128") == 0 && files.getIntValue("size_320") == 0)
                         {
