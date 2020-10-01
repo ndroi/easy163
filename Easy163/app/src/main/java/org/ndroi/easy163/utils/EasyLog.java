@@ -12,7 +12,10 @@ public class EasyLog
 
     public static void log(String info)
     {
-        logger.log(info);
+        if(logger != null)
+        {
+            logger.log(info);
+        }
     }
 
     public static void setTextView(TextView textView)

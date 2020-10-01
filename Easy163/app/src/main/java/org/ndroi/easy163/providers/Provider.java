@@ -182,7 +182,7 @@ public abstract class Provider
                     song.md5 = qqMusicMd5;
                 }
                 byte[] mp3Data = ReadStream.read(connection.getInputStream());
-                song.br = BitRate.Detect(mp3Data);
+                song.br = BitRate.detect(mp3Data);
             }
         } catch (IOException e)
         {

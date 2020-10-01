@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -15,11 +16,14 @@ import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import android.service.quicksettings.TileService;
 import android.util.Log;
 import org.ndroi.easy163.R;
 import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.core.Server;
+import org.ndroi.easy163.ui.EasyTileService;
 import org.ndroi.easy163.ui.MainActivity;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.bio.BioTcpHandler;
@@ -48,12 +52,17 @@ public class LocalVPNService extends VpnService
     private BlockingQueue<Packet> deviceToNetworkTCPQueue;
     private BlockingQueue<ByteBuffer> networkToDeviceQueue;
     private ExecutorService executorService;
-    private Boolean isRunning = false;
+    private static Boolean isRunning = false;
     private static Context context = null;
 
     public static Context getContext()
     {
         return context;
+    }
+
+    public static Boolean getIsRunning()
+    {
+        return isRunning;
     }
 
     private BroadcastReceiver stopReceiver = new BroadcastReceiver()
@@ -81,7 +90,7 @@ public class LocalVPNService extends VpnService
         super.onCreate();
         context = getApplicationContext();
         setupVPN();
-        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("activity"));
+        LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("control"));
         deviceToNetworkUDPQueue = new ArrayBlockingQueue<Packet>(1000);
         deviceToNetworkTCPQueue = new ArrayBlockingQueue<Packet>(1000);
         networkToDeviceQueue = new ArrayBlockingQueue<>(1000);
@@ -95,6 +104,8 @@ public class LocalVPNService extends VpnService
         Cache.init();
         Local.load();
         isRunning = true;
+        sendState();
+        TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
         Log.i(TAG, "Easy163 VPN 启动");
     }
 
@@ -165,7 +176,6 @@ public class LocalVPNService extends VpnService
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
     {
-        sendState();
         return START_STICKY;
     }
 
@@ -173,12 +183,11 @@ public class LocalVPNService extends VpnService
     public void onDestroy()
     {
         super.onDestroy();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(stopReceiver);
         executorService.shutdownNow();
         cleanup();
         isRunning = false;
         sendState();
-        EasyLog.log("Easy163 VPN 停止运行");
+        TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
         Log.i(TAG, "Stopped");
     }
 
@@ -192,9 +201,11 @@ public class LocalVPNService extends VpnService
 
     private void sendState()
     {
+        MainActivity.resetBroadcastReceivedState();
         Intent replyIntent=  new Intent("service");
         replyIntent.putExtra("isRunning", isRunning);
         LocalBroadcastManager.getInstance(this).sendBroadcast(replyIntent);
+        Log.i(TAG, "sendState");
     }
 
     private static void closeResources(Closeable... resources)

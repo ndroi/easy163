@@ -27,7 +27,6 @@ import org.ndroi.easy163.core.Cache;
 import org.ndroi.easy163.core.Local;
 import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.vpn.LocalVPNService;
-import java.util.List;
 import static androidx.appcompat.app.AlertDialog.Builder;
 
 public class MainActivity extends AppCompatActivity
@@ -35,14 +34,19 @@ public class MainActivity extends AppCompatActivity
 {
     private static final int VPN_REQUEST_CODE = 0x0F;
     private ToggleButton toggleButton = null;
-    private boolean isBroadcastReceived = false; // workaround for multi-receive
+    private static boolean isBroadcastReceived = false; // workaround for multi-receive
+    public static void resetBroadcastReceivedState()
+    {
+        isBroadcastReceived = false;
+    }
 
     private BroadcastReceiver serviceReceiver = new BroadcastReceiver()
     {
         @Override
         public void onReceive(Context context, Intent intent)
         {
-            if(isBroadcastReceived) return;
+            if (isBroadcastReceived) return;
+            isBroadcastReceived = true;
             boolean isServiceRunning = intent.getBooleanExtra("isRunning", false);
             Log.d("MainActivity", "BroadcastReceiver service isRunning: " + isServiceRunning);
             toggleButton.setChecked(isServiceRunning);
@@ -50,8 +54,10 @@ public class MainActivity extends AppCompatActivity
             {
                 EasyLog.log("Easy163 VPN 正在运行");
                 EasyLog.log("版本更新关注 Github Release");
+            }else
+            {
+                EasyLog.log("Easy163 VPN 停止运行");
             }
-            isBroadcastReceived = true;
         }
     };
 
@@ -172,7 +178,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
     {
-        isBroadcastReceived = false;
         if (isChecked)
         {
             startVPN();
@@ -184,9 +189,8 @@ public class MainActivity extends AppCompatActivity
 
     private void syncServiceState()
     {
-        Intent intent = new Intent("activity");
+        Intent intent = new Intent("control");
         intent.putExtra("cmd", "check");
-        isBroadcastReceived = false;
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
@@ -201,7 +205,7 @@ public class MainActivity extends AppCompatActivity
 
     private void stopVPN()
     {
-        Intent intent = new Intent("activity");
+        Intent intent = new Intent("control");
         intent.putExtra("cmd", "stop");
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
         Log.d("stopVPN", "try to stopVPN");

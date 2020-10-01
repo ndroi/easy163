@@ -30,7 +30,7 @@ public class BitRate
         table.put(0, map_2);
     }
 
-    public static int Detect(byte[] bytes)
+    public static int detect(byte[] bytes)
     {
         int ptr = 0;
         if (bytes[0] == 'f' && bytes[1] == 'L' && bytes[2] == 'a' && bytes[3] == 'C')
