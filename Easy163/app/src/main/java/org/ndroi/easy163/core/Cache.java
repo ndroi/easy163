@@ -1,17 +1,7 @@
 package org.ndroi.easy163.core;
 
-import android.util.Log;
-import org.ndroi.easy163.ui.MainActivity;
-import org.ndroi.easy163.utils.EasyLog;
 import org.ndroi.easy163.utils.Keyword;
-import org.ndroi.easy163.utils.ReadStream;
 import org.ndroi.easy163.utils.Song;
-import org.ndroi.easy163.vpn.LocalVPNService;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 

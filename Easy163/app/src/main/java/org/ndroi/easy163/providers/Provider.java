@@ -69,7 +69,6 @@ public abstract class Provider
             }
             singers = tmp;
         }
-        singers = singers.substring(0, singers.length() - 1);
         String queryStr = songName + " " + singers;
         try
         {

@@ -10,13 +10,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import android.service.quicksettings.TileService;
 import android.util.Log;
 import org.ndroi.easy163.R;
@@ -119,16 +116,14 @@ public class LocalVPNService extends VpnService
             NotificationChannel channel = new NotificationChannel(notificationId, notificationName, NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
         }
-        Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.icon);
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, 0);
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.icon)
-                .setLargeIcon(icon)
                 .setContentTitle("Easy163")
-                .setContentText("Easy163 正在运行...");
+                .setContentText("正在运行...");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             builder.setChannelId(notificationId);

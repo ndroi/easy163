@@ -120,8 +120,8 @@ public class MainActivity extends AppCompatActivity
             Builder builder = new Builder(this);
             builder.setTitle("使用说明");
             builder.setMessage("开启本软件 VPN 服务后即可使用\n" +
-                    "如音乐软件无法联网请重启手机\n" +
-                    "清空音乐软件缓存后请重启本软件\n" +
+                    "如无法启动 VPN 尝试重启手机\n" +
+                    "出现异常问题尝试情况软件缓存\n" +
                     "更多问题请查阅 Github");
             builder.setNegativeButton("取消", new DialogInterface.OnClickListener()
             {
