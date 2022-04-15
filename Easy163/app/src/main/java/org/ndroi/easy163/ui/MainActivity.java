@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
             if(isServiceRunning)
             {
                 EasyLog.log("Easy163 VPN 正在运行");
-                EasyLog.log("版本更新关注 Github Release");
+                EasyLog.log("原作者: ndroi, 此版本由溯洄w4123修改");
             }else
             {
                 EasyLog.log("Easy163 VPN 停止运行");
