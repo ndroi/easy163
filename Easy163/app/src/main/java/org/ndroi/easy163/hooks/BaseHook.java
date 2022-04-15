@@ -9,5 +9,7 @@ public abstract class BaseHook extends Hook
     public void hookRequest(Request request)
     {
         request.getHeaderFields().remove("X-NAPM-RETRY");
+        request.getHeaderFields().remove("Accept-Encoding");
+        request.getHeaderFields().put("X-Real-IP", "175.17.223.14");
     }
 }

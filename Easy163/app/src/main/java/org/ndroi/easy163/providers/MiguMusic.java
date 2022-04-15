@@ -48,8 +48,12 @@ public class MiguMusic extends Provider
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
+                if (jsonObject == null)
+                {
+                    return;
+                }
                 JSONArray candidates = jsonObject.getJSONArray("musics");
-                if(candidates == null)
+                if (candidates == null)
                 {
                     return;
                 }
