@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
@@ -25,8 +27,8 @@ public class MiguMusic extends Provider
 
     private void setHttpHeader(HttpURLConnection connection)
     {
-        connection.setRequestProperty("origin", "https://music.migu.cn/");
-        connection.setRequestProperty("referer", "https://music.migu.cn/");
+        connection.setRequestProperty("origin", "https://m.music.migu.cn/");
+        connection.setRequestProperty("referer", "https://m.music.migu.cn/");
         connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36");
     }
 
@@ -74,8 +76,38 @@ public class MiguMusic extends Provider
         }
     }
 
-    private void requestSongUrl(String mId, String type, Map<String, String> results)
+    private String requestSongUrl(String mId)
     {
+        String url = "https://m.music.migu.cn/migu/remoting/cms_detail_tag?cpid=";
+        String req = url + mId;
+        try
+        {
+            HttpURLConnection connection = (HttpURLConnection) new URL(req).openConnection();
+            connection.setRequestMethod("GET");
+            setHttpHeader(connection);
+            connection.connect();
+            int responseCode = connection.getResponseCode();
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                byte[] content = ReadStream.read(connection.getInputStream());
+                String str = new String(content);
+                JSONObject jsonObject = JSONObject.parseObject(str);
+                if (jsonObject.containsKey("data"))
+                {
+                    String songUrl = jsonObject.getJSONObject("data").getString("listenUrl");
+                    if(songUrl == null || songUrl.isEmpty())
+                    {
+                        return null;
+                    }
+                    return songUrl;
+                }
+            }
+            return null;
+        } catch (IOException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+        /*
         String url = "https://music.migu.cn/v3/api/music/audioPlayer/getPlayInfo?dataType=2&";
         String param = "{\"copyrightId\":\"" + mId + "\",\"type\":" + type + "}";
         String req = url + MiguCrypto.Encrypt(param);
@@ -113,6 +145,8 @@ public class MiguMusic extends Provider
         {
             e.printStackTrace();
         }
+        */
+
     }
 
     @Override
@@ -138,6 +172,13 @@ public class MiguMusic extends Provider
     public Song fetchSongByJson(JSONObject jsonObject)
     {
         String mId = jsonObject.getString("mid");
+        String url = requestSongUrl(mId);
+        if (url != null)
+        {
+            return generateSong(url);
+        }
+        return null;
+        /*
         ConcurrencyTask concurrencyTask = new ConcurrencyTask();
         Map<String, String> typeSongUrls = new HashMap<>();
         for (String type : new String[]{"1", "2"})
@@ -161,5 +202,6 @@ public class MiguMusic extends Provider
             return generateSong(typeSongUrls.get("1"));
         }
         return null;
+        */
     }
 }
