@@ -250,6 +250,12 @@ public class BioUdpHandler implements Runnable
             {
                 t.interrupt();
             }
+
+            for (DatagramChannel channel: udpSockets.values()) {
+                try {
+                    channel.close();
+                } catch(Exception ignored) {}
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.StrictMode;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
@@ -70,6 +72,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                .detectLeakedClosableObjects()
+                .penaltyLog()
+                .build());
         super.onCreate(savedInstanceState);
         LocalBroadcastManager.getInstance(this).registerReceiver(serviceReceiver, new IntentFilter("service"));
         setContentView(R.layout.activity_main);

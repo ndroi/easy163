@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -52,6 +53,9 @@ public class BioTcpHandler implements Runnable
         public boolean downActive = true;
         public String tunnelKey;
         public BlockingQueue<String> tunnelCloseMsgQueue;
+
+        Thread upStreamThread = null;
+        Thread downStreamThread = null;
     }
 
     private static final String TAG = BioTcpHandler.class.getSimpleName();
@@ -134,11 +138,11 @@ public class BioTcpHandler implements Runnable
 
         private void startDownStream()
         {
-            Thread t = new Thread(new DownStreamWorker(tunnel));
-            t.start();
+            this.tunnel.downStreamThread = new Thread(new DownStreamWorker(tunnel));
+            this.tunnel.downStreamThread.start();
         }
 
-        private void connectRemote()
+        private void connectRemote() throws ClosedByInterruptException
         {
             try
             {
@@ -156,7 +160,11 @@ public class BioTcpHandler implements Runnable
                 tunnel.destSocket = remote;
 
                 startDownStream();
-            } catch (Exception e)
+            } catch (ClosedByInterruptException e)
+            {
+                throw e;
+            }
+            catch (Exception e)
             {
                 Log.e(TAG, e.getMessage(), e);
                 throw new ProxyException("connectRemote fail" + tunnel.destinationAddress.toString());
@@ -306,7 +314,6 @@ public class BioTcpHandler implements Runnable
                     }
                 } catch (InterruptedException e)
                 {
-                    e.printStackTrace();
                     break;
                 } catch (IOException e)
                 {
@@ -326,11 +333,15 @@ public class BioTcpHandler implements Runnable
                     connectRemote();
                 }
                 loop();
-            } catch (ProxyException e)
+            }
+            catch (ClosedByInterruptException ignored)
+            {
+
+            }
+            catch (ProxyException e)
             {
                 e.printStackTrace();
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -466,12 +477,13 @@ public class BioTcpHandler implements Runnable
                         }
                     }
                 }
-            } catch (InterruptedException e)
+            } catch (InterruptedException | ClosedByInterruptException e)
             {
                 Log.w(TAG, String.format("channel closed due to interrupt %s", e.getMessage()));
                 quitType = "rst";
             } catch (ClosedChannelException e)
             {
+                e.printStackTrace();
                 Log.w(TAG, String.format("channel closed %s", e.getMessage()));
                 quitType = "rst";
             } catch (IOException e)
@@ -504,8 +516,8 @@ public class BioTcpHandler implements Runnable
         tunnel.vpnService = vpnService;
         tunnel.networkToDeviceQueue = networkToDeviceQueue;
         tunnel.tunnelCloseMsgQueue = tunnelCloseMsgQueue;
-        Thread t = new Thread(new UpStreamWorker(tunnel));
-        t.start();
+        tunnel.upStreamThread  = new Thread(new UpStreamWorker(tunnel));
+        tunnel.upStreamThread.start();
         return tunnel;
     }
 
@@ -549,13 +561,20 @@ public class BioTcpHandler implements Runnable
                 tcpTunnel.tunnelInputQueue.offer(currentPacket);
             } catch (InterruptedException e)
             {
-                e.printStackTrace();
                 break;
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
+        }
+
+        for(TcpTunnel tunnel : tunnels.values())
+        {
+            if (tunnel.downStreamThread != null && tunnel.downStreamThread.isAlive())
+                tunnel.downStreamThread.interrupt();
+            if (tunnel.upStreamThread != null && tunnel.upStreamThread.isAlive())
+                tunnel.upStreamThread.interrupt();
         }
     }
 }
