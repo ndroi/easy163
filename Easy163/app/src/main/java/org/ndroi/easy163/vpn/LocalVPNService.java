@@ -187,6 +187,7 @@ public class LocalVPNService extends VpnService
         cleanup();
         isRunning = false;
         sendState();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(stopReceiver);
         unregisterReceiver(stopReceiver);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
