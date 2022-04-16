@@ -3,13 +3,17 @@ package org.ndroi.easy163.ui;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.net.VpnService;
+import android.os.Build;
 import android.os.IBinder;
 import android.service.quicksettings.Tile;
 import android.service.quicksettings.TileService;
 import android.util.Log;
 import org.ndroi.easy163.vpn.LocalVPNService;
+
+import androidx.annotation.RequiresApi;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+@RequiresApi(Build.VERSION_CODES.N)
 public class EasyTileService extends TileService
 {
     @Override

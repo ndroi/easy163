@@ -1,10 +1,10 @@
 package org.ndroi.easy163.utils;
 
 import android.text.method.ScrollingMovementMethod;
-import android.view.View;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public class EasyLog
 {
@@ -34,7 +34,7 @@ public class EasyLog
 
         private String genTime()
         {
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("[HH:mm:ss]");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("[HH:mm:ss]", Locale.US);
             String time = simpleDateFormat.format(new Date());
             return time;
         }
@@ -43,14 +43,7 @@ public class EasyLog
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(genTime() + " " + info + "\n");
-            textView.post(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    textView.append(stringBuilder);
-                }
-            });
+            textView.post(() -> textView.append(stringBuilder));
         }
     }
 }

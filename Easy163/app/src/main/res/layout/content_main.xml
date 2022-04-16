@@ -13,20 +13,24 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <TextView
+            android:id="@+id/log"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_above="@id/bt_start"
+            android:layout_centerHorizontal="true"
             android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
             android:layout_marginTop="40dp"
+            android:layout_marginRight="20dp"
             android:layout_marginBottom="30dp"
-            android:gravity="bottom"
-            android:typeface="monospace"
-            android:scrollbars="vertical"
             android:clickable="true"
-            android:id="@+id/log" />
+            android:contentDescription="@string/log_content_description"
+            android:focusable="true"
+            android:gravity="bottom"
+            android:minHeight="48dp"
+            android:scrollbars="vertical"
+            android:typeface="monospace" />
 
         <ToggleButton
             android:layout_width="wrap_content"
@@ -34,8 +38,8 @@
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="150dp"
-            android:textOn="服务开启中，点击关闭"
-            android:textOff="服务关闭中，点击开启"
+            android:textOn="@string/bt_start_text_off"
+            android:textOff="@string/bt_start_text_on"
             android:stateListAnimator="@null"
             android:id="@+id/bt_start" />
     </RelativeLayout>

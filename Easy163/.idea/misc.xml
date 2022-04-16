@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/zzq18/easy163/Easy163/app/src/main/res/layout/activity_main.xml" value="0.16799999999999998" />
+        <entry key="..\:/Users/zzq18/easy163/Easy163/app/src/main/res/layout/app_bar_main.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/zzq18/easy163/Easy163/app/src/main/res/layout/content_main.xml" value="0.2" />
+        <entry key="..\:/Users/zzq18/easy163/Easy163/app/src/main/res/layout/nav_header_main.xml" value="0.264" />
+        <entry key="..\:/Users/zzq18/easy163/Easy163/app/src/main/res/menu/activity_main_drawer.xml" value="0.10989583333333333" />
+      </map>
+    </option>
+  </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />
     <option name="myDefaultNotNull" value="android.support.annotation.NonNull" />
@@ -44,7 +55,7 @@
       </value>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8 (1)" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8 (1)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

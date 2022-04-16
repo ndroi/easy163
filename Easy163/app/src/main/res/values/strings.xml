@@ -5,4 +5,7 @@
     <string name="nav_header_title">easy163</string>
     <string name="nav_header_subtitle">github.com/ndroi</string>
     <string name="nav_header_desc">Navigation header</string>
+    <string name="bt_start_text_on">服务关闭中，点击开启</string>
+    <string name="bt_start_text_off">服务开启中，点击关闭</string>
+    <string name="log_content_description">运行日志</string>
 </resources>

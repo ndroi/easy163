@@ -104,7 +104,9 @@ public class LocalVPNService extends VpnService
         Local.load();
         isRunning = true;
         sendState();
-        TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
+        }
         Log.i(TAG, "Easy163 VPN 启动");
     }
 
@@ -120,7 +122,7 @@ public class LocalVPNService extends VpnService
         }
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationId)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.icon)
@@ -180,7 +182,9 @@ public class LocalVPNService extends VpnService
         cleanup();
         isRunning = false;
         sendState();
-        TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
+        }
         Log.i(TAG, "Stopped");
     }
 

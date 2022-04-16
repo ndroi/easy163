@@ -46,7 +46,7 @@ public class BioUdpHandler implements Runnable
 
         private static AtomicInteger ipId = new AtomicInteger();
 
-        private void sendUdpPack(UdpTunnel tunnel, InetSocketAddress source, byte[] data) throws IOException
+        private void sendUdpPack(UdpTunnel tunnel, byte[] data) throws IOException
         {
             int dataLen = 0;
             if (data != null)
@@ -128,7 +128,7 @@ public class BioUdpHandler implements Runnable
                                 receiveBuffer.flip();
                                 byte[] data = new byte[receiveBuffer.remaining()];
                                 receiveBuffer.get(data);
-                                sendUdpPack((UdpTunnel) key.attachment(), (InetSocketAddress) inputChannel.getLocalAddress(), data);
+                                sendUdpPack((UdpTunnel) key.attachment(), data);
                             } catch (IOException e)
                             {
                                 Log.e(TAG, "error", e);
