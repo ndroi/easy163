@@ -90,6 +90,7 @@ public class LocalVPNService extends VpnService
         context = getApplicationContext();
         setupVPN();
         LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter("control"));
+        registerReceiver(stopReceiver, new IntentFilter("control"));
         deviceToNetworkUDPQueue = new ArrayBlockingQueue<Packet>(1000);
         deviceToNetworkTCPQueue = new ArrayBlockingQueue<Packet>(1000);
         networkToDeviceQueue = new ArrayBlockingQueue<>(1000);
@@ -123,11 +124,15 @@ public class LocalVPNService extends VpnService
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, PendingIntent.FLAG_IMMUTABLE);
+        Intent stopIntent = new Intent("control");
+        stopIntent.putExtra("cmd", "stop");
+        PendingIntent stopPendingIntent = PendingIntent.getBroadcast(this, 101, stopIntent, PendingIntent.FLAG_IMMUTABLE);
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationId)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.icon)
                 .setContentTitle("Easy163")
-                .setContentText("正在运行...");
+                .setContentText("正在运行...")
+                .addAction(R.mipmap.icon, "停止", stopPendingIntent);
         Notification notification = builder.build();
         startForeground(1, notification);
     }
@@ -182,6 +187,7 @@ public class LocalVPNService extends VpnService
         cleanup();
         isRunning = false;
         sendState();
+        unregisterReceiver(stopReceiver);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             TileService.requestListeningState(this, new ComponentName(this, EasyTileService.class));
         }

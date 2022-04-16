@@ -11,6 +11,7 @@ import android.util.Log;
 import org.ndroi.easy163.vpn.LocalVPNService;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 @RequiresApi(Build.VERSION_CODES.N)
@@ -78,7 +79,7 @@ public class EasyTileService extends TileService
         if (VpnService.prepare(this) == null)
         {
             Intent intent = new Intent(this, LocalVPNService.class);
-            startService(intent);
+            ContextCompat.startForegroundService(this, intent);
         } else
         {
             Intent intent = new Intent(this, MainActivity.class);

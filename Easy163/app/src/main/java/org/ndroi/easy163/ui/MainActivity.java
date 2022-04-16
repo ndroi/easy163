@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity
                     if (result.getResultCode() == RESULT_OK)
                     {
                         Intent intent = new Intent(MainActivity.this, LocalVPNService.class);
-                        startService(intent);
+                        ContextCompat.startForegroundService(this, intent);
                     }
                 }
         );
@@ -223,7 +224,7 @@ public class MainActivity extends AppCompatActivity
             intentActivityResultLauncher.launch(vpnIntent);
         else {
             Intent intent = new Intent(this, LocalVPNService.class);
-            startService(intent);
+            ContextCompat.startForegroundService(this, intent);
         }
     }
 
