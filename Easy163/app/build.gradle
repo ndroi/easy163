@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 31
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "org.ndroi.easy163"
         minSdkVersion 24
-        targetSdkVersion 29
+        targetSdkVersion 31
         versionCode 26
         versionName "1.8.8"
     }
@@ -24,9 +24,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.alibaba:fastjson:1.1.55.android'
-    implementation 'com.android.support:appcompat-v7'
+    implementation 'com.alibaba:fastjson:1.1.73.android'
+    implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.2.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 }

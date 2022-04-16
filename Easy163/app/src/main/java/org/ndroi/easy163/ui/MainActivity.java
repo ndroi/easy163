@@ -10,6 +10,12 @@ import android.net.Uri;
 import android.net.VpnService;
 import android.os.Bundle;
 import com.google.android.material.navigation.NavigationView;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -32,13 +38,13 @@ import static androidx.appcompat.app.AlertDialog.Builder;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, ToggleButton.OnCheckedChangeListener
 {
-    private static final int VPN_REQUEST_CODE = 0x0F;
     private ToggleButton toggleButton = null;
     private static boolean isBroadcastReceived = false; // workaround for multi-receive
     public static void resetBroadcastReceivedState()
     {
         isBroadcastReceived = false;
     }
+    private ActivityResultLauncher<Intent> intentActivityResultLauncher;
 
     private BroadcastReceiver serviceReceiver = new BroadcastReceiver()
     {
@@ -80,6 +86,16 @@ public class MainActivity extends AppCompatActivity
         toggleButton.setOnCheckedChangeListener(this);
         EasyLog.setTextView(findViewById(R.id.log));
         syncServiceState();
+        intentActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK)
+                    {
+                        Intent intent = new Intent(MainActivity.this, LocalVPNService.class);
+                        startService(intent);
+                    }
+                }
+        );
     }
 
     @Override
@@ -198,9 +214,11 @@ public class MainActivity extends AppCompatActivity
     {
         Intent vpnIntent = VpnService.prepare(this);
         if (vpnIntent != null)
-            startActivityForResult(vpnIntent, VPN_REQUEST_CODE);
-        else
-            onActivityResult(VPN_REQUEST_CODE, RESULT_OK, null);
+            intentActivityResultLauncher.launch(vpnIntent);
+        else {
+            Intent intent = new Intent(this, LocalVPNService.class);
+            startService(intent);
+        }
     }
 
     private void stopVPN()
@@ -211,14 +229,4 @@ public class MainActivity extends AppCompatActivity
         Log.d("stopVPN", "try to stopVPN");
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == VPN_REQUEST_CODE && resultCode == RESULT_OK)
-        {
-            Intent intent = new Intent(this, LocalVPNService.class);
-            startService(intent);
-        }
-    }
 }
