@@ -254,7 +254,7 @@ public class LocalVPNService extends VpnService
             @Override
             public void run()
             {
-                while (true)
+                while (!Thread.interrupted())
                 {
                     try
                     {
@@ -264,7 +264,11 @@ public class LocalVPNService extends VpnService
                         {
                             int w = vpnOutput.write(bufferFromNetwork);
                         }
-                    } catch (Exception e)
+                    } catch (InterruptedException e)
+                    {
+                        break;
+                    }
+                    catch (Exception e)
                     {
                         Log.i(TAG, "WriteVpnThread fail", e);
                     }
@@ -301,20 +305,18 @@ public class LocalVPNService extends VpnService
                         }
                     } else
                     {
-                        try
-                        {
-                            Thread.sleep(50);
-                        } catch (InterruptedException e)
-                        {
-                            e.printStackTrace();
-                        }
+                        Thread.sleep(50);
                     }
                 }
-            } catch (IOException e)
+            } catch (InterruptedException ignored)
+            {
+
+            }catch (IOException e)
             {
                 Log.w(TAG, e.toString(), e);
             } finally
             {
+                t.interrupt();
                 closeResources(vpnInput, vpnOutput);
             }
         }

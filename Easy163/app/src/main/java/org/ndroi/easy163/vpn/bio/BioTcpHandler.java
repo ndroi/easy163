@@ -273,7 +273,7 @@ public class BioTcpHandler implements Runnable
 
         private void loop()
         {
-            while (true)
+            while (!Thread.interrupted())
             {
                 Packet packet = null;
                 try
@@ -307,6 +307,7 @@ public class BioTcpHandler implements Runnable
                 } catch (InterruptedException e)
                 {
                     e.printStackTrace();
+                    break;
                 } catch (IOException e)
                 {
                     e.printStackTrace();
@@ -433,7 +434,7 @@ public class BioTcpHandler implements Runnable
             String quitType = "rst";
             try
             {
-                while (true)
+                while (!Thread.interrupted())
                 {
                     ByteBuffer buffer = ByteBuffer.allocateDirect(4 * 1024);
                     if (tunnel.destSocket == null)
@@ -465,6 +466,10 @@ public class BioTcpHandler implements Runnable
                         }
                     }
                 }
+            } catch (InterruptedException e)
+            {
+                Log.w(TAG, String.format("channel closed due to interrupt %s", e.getMessage()));
+                quitType = "rst";
             } catch (ClosedChannelException e)
             {
                 Log.w(TAG, String.format("channel closed %s", e.getMessage()));
@@ -510,7 +515,7 @@ public class BioTcpHandler implements Runnable
     public void run()
     {
 
-        while (true)
+        while (!Thread.interrupted())
         {
             try
             {
@@ -542,7 +547,12 @@ public class BioTcpHandler implements Runnable
                     tunnels.put(ipAndPort, tcpTunnel);
                 }
                 tcpTunnel.tunnelInputQueue.offer(currentPacket);
-            } catch (Exception e)
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+                break;
+            }
+            catch (Exception e)
             {
                 e.printStackTrace();
             }

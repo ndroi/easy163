@@ -39,7 +39,6 @@ public class BioUdpHandler implements Runnable
 
     private static class UdpDownWorker implements Runnable
     {
-
         BlockingQueue<ByteBuffer> networkToDeviceQueue;
         BlockingQueue<UdpTunnel> tunnelQueue;
         Selector selector;
@@ -84,7 +83,7 @@ public class BioUdpHandler implements Runnable
         {
             try
             {
-                while (true)
+                while (!Thread.interrupted())
                 {
                     int readyChannels = selector.select();
                     while (true)
@@ -137,13 +136,14 @@ public class BioUdpHandler implements Runnable
                         }
                     }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Log.e(TAG, "error", e);
                 System.exit(0);
             } finally
             {
-                //Log.d(TAG, "BioUdpHandler quit");
+                Log.d(TAG, "BioUdpHandler quit");
             }
 
 
@@ -174,15 +174,16 @@ public class BioUdpHandler implements Runnable
     @Override
     public void run()
     {
+        Thread t = null;
         try
         {
             BlockingQueue<UdpTunnel> tunnelQueue = new ArrayBlockingQueue<>(100);
             selector = Selector.open();
-            Thread t = new Thread(new UdpDownWorker(selector, networkToDeviceQueue, tunnelQueue));
+            t = new Thread(new UdpDownWorker(selector, networkToDeviceQueue, tunnelQueue));
             t.start();
 
 
-            while (true)
+            while (!Thread.interrupted())
             {
                 Packet packet = queue.take();
 
@@ -234,10 +235,21 @@ public class BioUdpHandler implements Runnable
                     udpSockets.remove(ipAndPort);
                 }
             }
-        } catch (Exception e)
+        } catch (InterruptedException ignored)
+        {
+
+        }
+        catch (Exception e)
         {
             Log.e(TAG, "error", e);
             //System.exit(0);
+        }
+        finally
+        {
+            if (t != null)
+            {
+                t.interrupt();
+            }
         }
     }
 }
