@@ -13,6 +13,8 @@ import android.content.pm.PackageManager;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+
+import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.service.quicksettings.TileService;
 import android.util.Log;
@@ -119,15 +121,11 @@ public class LocalVPNService extends VpnService
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, intent, 0);
-        Notification.Builder builder = new Notification.Builder(this)
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, notificationId)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.mipmap.icon)
                 .setContentTitle("Easy163")
                 .setContentText("正在运行...");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            builder.setChannelId(notificationId);
-        }
         Notification notification = builder.build();
         startForeground(1, notification);
     }

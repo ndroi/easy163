@@ -29,8 +29,7 @@ task clean(type: Delete) {
 allprojects {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xlint:deprecation"
-            options.compilerArgs << "-Xlint:unchecked"
+            options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
         }
     }
 }

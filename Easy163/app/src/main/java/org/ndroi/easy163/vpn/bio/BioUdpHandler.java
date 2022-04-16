@@ -160,7 +160,7 @@ public class BioUdpHandler implements Runnable
     private static final String TAG = BioUdpHandler.class.getSimpleName();
 
 
-    Map<String, DatagramChannel> udpSockets = new HashMap();
+    Map<String, DatagramChannel> udpSockets = new HashMap<>();
 
 
     private static class UdpTunnel
