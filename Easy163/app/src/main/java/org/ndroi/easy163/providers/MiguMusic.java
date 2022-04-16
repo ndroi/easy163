@@ -62,6 +62,7 @@ public class MiguMusic extends Provider
                 for (Object infoObj : candidates)
                 {
                     JSONObject songJSONObject = (JSONObject) infoObj;
+                    if (songJSONObject.getString("mp3") == null) continue;
                     String songName = songJSONObject.getString("songName");
                     Keyword candidateKeyword = new Keyword();
                     candidateKeyword.songName = songName;

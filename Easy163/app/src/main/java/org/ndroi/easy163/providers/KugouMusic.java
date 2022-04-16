@@ -37,7 +37,7 @@ public class KugouMusic extends Provider
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
                 JSONObject jsonObject = JSONObject.parseObject(str);
-                if (jsonObject.getIntValue("status") == 1)
+                if (jsonObject != null && jsonObject.getIntValue("status") == 1)
                 {
                     try
                     {
@@ -71,7 +71,7 @@ public class KugouMusic extends Provider
             return null;
         }
         JSONObject songJsonObject = songJsonObjects.get(selectedIndex);
-        //Log.d("kugou", songJsonObject.toJSONString());
+        Log.d("kugou", songJsonObject.toJSONString());
         String mId = songJsonObject.getString("HQFileHash");
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("mid", mId);
@@ -87,7 +87,7 @@ public class KugouMusic extends Provider
     public Song fetchSongByJson(JSONObject jsonObject)
     {
         String mId = jsonObject.getString("mid");
-        if(mId == null)
+        if (mId == null || mId.isEmpty())
         {
             return null;
         }
@@ -110,7 +110,7 @@ public class KugouMusic extends Provider
             e.printStackTrace();
         }
         String url = "http://trackercdn.kugou.com/i/v2/?key=" + key + "&hash=" + mId +
-                "&br=hq&appid=1005&pid=2&cmd=25&behavior=play";
+                "&br=hq&appid=1005&pid=2&cmd=25&behavior=download";
         try
         {
             HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
@@ -121,6 +121,7 @@ public class KugouMusic extends Provider
             {
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
+                Log.i("Kugou", str);
                 JSONObject jo = JSONObject.parseObject(str);
                 song = new Song();
                 song.url = jo.getJSONArray("url").getString(0);

@@ -198,9 +198,9 @@ public abstract class Provider
     {
         List<Provider> providers = Arrays.asList(
                 new KuwoMusic(targetKeyword),
-                new MiguMusic(targetKeyword),
-                new QQMusic(targetKeyword)
-                //new KugouMusic(targetKeyword)
+                new MiguMusic(targetKeyword)
+                // new QQMusic(targetKeyword)
+                // new KugouMusic(targetKeyword)
         );
         return providers;
     }

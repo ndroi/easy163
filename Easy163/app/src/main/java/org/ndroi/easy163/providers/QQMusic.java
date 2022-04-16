@@ -1,5 +1,7 @@
 package org.ndroi.easy163.providers;
 
+import android.util.Log;
+
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.ndroi.easy163.core.Local;
@@ -37,6 +39,7 @@ public class QQMusic extends Provider
             {
                 byte[] content = ReadStream.read(connection.getInputStream());
                 String str = new String(content);
+                Log.i("QQ", str);
                 JSONObject jsonObject = JSONObject.parseObject(str);
                 if (jsonObject.getIntValue("code") == 0)
                 {
