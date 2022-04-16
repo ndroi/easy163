@@ -23,4 +23,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x ./Easy163/gradlew
     - name: Build with Gradle
-      run: ./Easy163/gradlew build
+      run: cd Easy163 && ./gradlew build
