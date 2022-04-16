@@ -32,7 +32,7 @@ public class HookHttp
     }
 
     private List<Hook> hooks = new ArrayList<>();
-    private Map<BioTcpHandler.TcpTunnel, Session> sessions = new HashMap();
+    private Map<BioTcpHandler.TcpTunnel, Session> sessions = new HashMap<>();
 
     private Hook findHook(Request request)
     {

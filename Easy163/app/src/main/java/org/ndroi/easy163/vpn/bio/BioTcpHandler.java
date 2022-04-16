@@ -24,7 +24,7 @@ public class BioTcpHandler implements Runnable
 {
     BlockingQueue<Packet> queue;
 
-    ConcurrentHashMap<String, TcpTunnel> tunnels = new ConcurrentHashMap();
+    ConcurrentHashMap<String, TcpTunnel> tunnels = new ConcurrentHashMap<>();
 
     private static int HEADER_SIZE = Packet.IP4_HEADER_SIZE + Packet.TCP_HEADER_SIZE;
 
